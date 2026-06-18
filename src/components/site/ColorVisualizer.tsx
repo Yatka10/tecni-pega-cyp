@@ -258,8 +258,7 @@ export function ColorVisualizer() {
                       maskSize: "100% 100%",
                       WebkitMaskRepeat: "no-repeat",
                       maskRepeat: "no-repeat",
-                      ("WebkitMaskMode" as any): "luminance",
-                      maskMode: "luminance" as any,
+                      ...({ WebkitMaskMode: "luminance", maskMode: "luminance" } as React.CSSProperties),
                     }}
                   />
                   {/* Tiny tint layer to bring color closer to selected hex on very dark walls */}
@@ -274,10 +273,10 @@ export function ColorVisualizer() {
                       maskSize: "100% 100%",
                       WebkitMaskRepeat: "no-repeat",
                       maskRepeat: "no-repeat",
-                      ("WebkitMaskMode" as any): "luminance",
-                      maskMode: "luminance" as any,
+                      ...({ WebkitMaskMode: "luminance", maskMode: "luminance" } as React.CSSProperties),
                     }}
                   />
+
                 </>
               )}
 
