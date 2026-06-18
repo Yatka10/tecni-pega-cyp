@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Palette,
   Sofa,
@@ -51,6 +51,101 @@ const productOptions = [
 
 type Coverage = "Sutil" | "Natural" | "Intenso";
 
+type RGB = { r: number; g: number; b: number };
+
+const clamp = (value: number, min = 0, max = 255) => Math.max(min, Math.min(max, value));
+
+function hexToRgb(hex: string): RGB {
+  const h = hex.replace("#", "");
+  return {
+    r: parseInt(h.slice(0, 2), 16),
+    g: parseInt(h.slice(2, 4), 16),
+    b: parseInt(h.slice(4, 6), 16),
+  };
+}
+
+function loadPaintImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+async function renderPaintedWalls({
+  photoSrc,
+  maskSrc,
+  color,
+  finish,
+  coverage,
+}: {
+  photoSrc: string;
+  maskSrc: string;
+  color: string;
+  finish: "Mate" | "Semimate";
+  coverage: Coverage;
+}) {
+  const [photo, mask] = await Promise.all([loadPaintImage(photoSrc), loadPaintImage(maskSrc)]);
+  const width = photo.naturalWidth;
+  const height = photo.naturalHeight;
+  const canvas = document.createElement("canvas");
+  const maskCanvas = document.createElement("canvas");
+  canvas.width = maskCanvas.width = width;
+  canvas.height = maskCanvas.height = height;
+
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const maskCtx = maskCanvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx || !maskCtx) return null;
+
+  ctx.drawImage(photo, 0, 0, width, height);
+  maskCtx.drawImage(mask, 0, 0, width, height);
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const maskData = maskCtx.getImageData(0, 0, width, height).data;
+  const data = imageData.data;
+  const target = hexToRgb(color);
+  const pigmentLightness = hexLightness(color);
+  const coverageStrength = coverage === "Sutil" ? 0.72 : coverage === "Intenso" ? 0.9 : 0.82;
+  const finishHighlight = finish === "Semimate" ? 0.4 : 0.26;
+  const surfaceRetention = finish === "Semimate" ? 0.18 : 0.12;
+  const pigmentCorrection = pigmentLightness > 0.72 ? 0.78 : pigmentLightness < 0.28 ? 0.92 : 0.86;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const maskAlpha = maskData[i + 3] / 255;
+    if (maskAlpha < 0.08) {
+      data[i + 3] = 0;
+      continue;
+    }
+
+    const originalR = data[i];
+    const originalG = data[i + 1];
+    const originalB = data[i + 2];
+    const luminance = (0.2126 * originalR + 0.7152 * originalG + 0.0722 * originalB) / 255;
+    const wallLight = clamp((luminance - 0.48) * 1.12 + 0.52, 0, 1);
+    const shade = 0.56 + wallLight * 0.66;
+    const highlight = Math.max(0, wallLight - 0.68) * finishHighlight;
+
+    let paintR = clamp(target.r * shade + 255 * highlight);
+    let paintG = clamp(target.g * shade + 255 * highlight);
+    let paintB = clamp(target.b * shade + 255 * highlight);
+
+    paintR = paintR * (1 - surfaceRetention) + originalR * surfaceRetention;
+    paintG = paintG * (1 - surfaceRetention) + originalG * surfaceRetention;
+    paintB = paintB * (1 - surfaceRetention) + originalB * surfaceRetention;
+
+    const strength = coverageStrength * pigmentCorrection;
+    data[i] = clamp(originalR * (1 - strength) + paintR * strength);
+    data[i + 1] = clamp(originalG * (1 - strength) + paintG * strength);
+    data[i + 2] = clamp(originalB * (1 - strength) + paintB * strength);
+    data[i + 3] = Math.round(255 * maskAlpha);
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  return canvas.toDataURL("image/webp", 0.92);
+}
+
 // Perceived lightness of a hex (0–1)
 function hexLightness(hex: string) {
   const h = hex.replace("#", "");
@@ -70,21 +165,25 @@ export function ColorVisualizer() {
 
   const selectedColor = colors[colorIdx];
   const activeRoom = rooms.find((r) => r.key === room)!;
+  const [paintedPreview, setPaintedPreview] = useState<string | null>(null);
 
-  // Realism calibration: darker pigments need more solid base, lighter ones less.
-  // Mate adds opacity; Semimate keeps more of the wall's reflective sheen.
-  const L = hexLightness(selectedColor.hex);
-  const coverageFactor = coverage === "Sutil" ? 0.78 : coverage === "Intenso" ? 1.12 : 1;
-  const finishBoost = finish === "Mate" ? 0.06 : -0.04;
-  const baseOpacity = Math.max(
-    0.32,
-    Math.min(0.85, (0.48 + (1 - L) * 0.35 + finishBoost) * coverageFactor)
-  );
-  const multiplyOpacity = Math.max(
-    0.55,
-    Math.min(1, (0.78 + finishBoost) * coverageFactor)
-  );
-  const colorBlendOpacity = Math.max(0.55, Math.min(1, 0.9 * coverageFactor));
+  useEffect(() => {
+    let cancelled = false;
+    setPaintedPreview(null);
+    renderPaintedWalls({
+      photoSrc: activeRoom.img,
+      maskSrc: activeRoom.mask,
+      color: selectedColor.hex,
+      finish,
+      coverage,
+    }).then((preview) => {
+      if (!cancelled) setPaintedPreview(preview);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeRoom.img, activeRoom.mask, coverage, finish, selectedColor.hex]);
 
   const groupedColors = useMemo(() => {
     return colorFamilies.map((f) => ({
@@ -279,7 +378,7 @@ export function ColorVisualizer() {
               ))}
             </div>
 
-            <div className="relative aspect-[16/10] rounded-3xl overflow-hidden shadow-[0_30px_60px_-30px_hsl(var(--brand-blue)/0.45)] border border-border bg-black group">
+            <div className="relative aspect-[20/13] rounded-3xl overflow-hidden shadow-[0_30px_60px_-30px_hsl(var(--brand-blue)/0.45)] border border-border bg-black group">
               {/* Base photo */}
               <img
                 key={activeRoom.key}
@@ -291,50 +390,17 @@ export function ColorVisualizer() {
                 loading="lazy"
               />
 
-              {/* Wall-only color overlay (masked) */}
-              {!comparing && (() => {
-                const maskStyle: React.CSSProperties = {
-                  WebkitMaskImage: `url(${activeRoom.mask})`,
-                  maskImage: `url(${activeRoom.mask})`,
-                  WebkitMaskSize: "100% 100%",
-                  maskSize: "100% 100%",
-                  WebkitMaskRepeat: "no-repeat",
-                  maskRepeat: "no-repeat",
-                  ...({ WebkitMaskMode: "luminance", maskMode: "luminance" } as React.CSSProperties),
-                };
-                return (
-                  <>
-                    {/* Solid base — guarantees full coverage on walls */}
-                    <div
-                      className="absolute inset-0 pointer-events-none transition-[background-color] duration-500 ease-out"
-                      style={{
-                        backgroundColor: selectedColor.hex,
-                        opacity: baseOpacity,
-                        ...maskStyle,
-                      }}
-                    />
-                    {/* Multiply layer keeps the wall's lighting and shadows */}
-                    <div
-                      className="absolute inset-0 pointer-events-none mix-blend-multiply transition-[background-color,opacity] duration-500 ease-out"
-                      style={{
-                        backgroundColor: selectedColor.hex,
-                        opacity: multiplyOpacity,
-                        ...maskStyle,
-                      }}
-                    />
-                    {/* Color layer locks the hue against the real wall texture */}
-                    <div
-                      className="absolute inset-0 pointer-events-none mix-blend-color transition-[background-color] duration-500 ease-out"
-                      style={{
-                        backgroundColor: selectedColor.hex,
-                        opacity: colorBlendOpacity,
-
-                        ...maskStyle,
-                      }}
-                    />
-                  </>
-                );
-              })()}
+              {/* Wall-only rendered paint layer */}
+              {!comparing && paintedPreview && (
+                <img
+                  src={paintedPreview}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 size-full object-cover pointer-events-none transition-opacity duration-300 ease-out"
+                  width={1280}
+                  height={832}
+                />
+              )}
 
 
               {/* Top bar */}
