@@ -9,8 +9,8 @@ import { Footer } from "@/components/site/Footer";
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { ColorVisualizer } from "@/components/site/ColorVisualizer";
 import { ProductCard } from "@/components/site/ProductCard";
+import { HeroSlider } from "@/components/site/HeroSlider";
 import { products, WHATSAPP_URL, WHATSAPP_PHONE, COMPANY_EMAIL } from "@/lib/products";
-import heroTexture from "@/assets/hero-texture.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -58,57 +58,26 @@ function Home() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
-      {/* HERO */}
-      <section className="relative overflow-hidden text-white">
-        <div className="absolute inset-0 gradient-brand" />
-        <img
-          src={heroTexture}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 size-full object-cover opacity-15 mix-blend-overlay"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-blue-deep/30 via-transparent to-brand-red/15" />
+      {/* HERO SLIDER */}
+      <HeroSlider />
 
-        <div className="container-x relative py-20 md:py-28 lg:py-32">
-          <span className="chip !bg-white/10 !text-white !border-white/20">
-            Fabricantes colombianos desde 2010
-          </span>
-          <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] max-w-4xl">
-            Acabados que <span className="text-brand-red">hablan</span> por tu obra
-          </h1>
-          <p className="mt-5 text-lg md:text-xl text-white/85 max-w-2xl">
-            Pegantes, pinturas, estucos y revestimientos de alto desempeño
-            fabricados en Colombia para cada proyecto.
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href="/catalogo" className="btn-primary">
-              <BookOpen className="size-5" /> Ver Catálogo
-            </a>
-            <a href="#visualizador" className="btn-outline-white">
-              <Palette className="size-5" /> Visualizador de Colores
-            </a>
-          </div>
-
-          <ul className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl">
+      {/* STATS STRIP */}
+      <section className="bg-white border-b border-border">
+        <div className="container-x py-8">
+          <ul className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {stats.map(({ Icon, value, label }) => (
-              <li key={label} className="bg-white/10 backdrop-blur border border-white/15 rounded-xl px-4 py-3 flex items-center gap-3">
-                <div className="size-10 rounded-lg bg-brand-red/90 grid place-items-center shrink-0">
-                  <Icon className="size-5" />
+              <li key={label} className="flex items-center gap-3">
+                <div className="size-12 rounded-xl bg-brand-blue-soft text-brand-blue grid place-items-center shrink-0">
+                  <Icon className="size-6" />
                 </div>
                 <div className="min-w-0">
-                  <div className="font-display font-extrabold text-xl leading-none">{value}</div>
-                  <div className="text-xs text-white/80 mt-0.5">{label}</div>
+                  <div className="font-display font-extrabold text-2xl leading-none text-brand-blue">{value}</div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{label}</div>
                 </div>
               </li>
             ))}
           </ul>
         </div>
-
-        {/* Diagonal cut */}
-        <svg className="absolute bottom-0 left-0 right-0 w-full" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden>
-          <path d="M0,60 L1440,0 L1440,60 Z" fill="white" />
-        </svg>
       </section>
 
       {/* VISUALIZADOR */}
