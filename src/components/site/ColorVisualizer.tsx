@@ -202,27 +202,50 @@ export function ColorVisualizer() {
                 </div>
               </div>
 
-              {/* Acabado */}
-              <div className="mt-5">
-                <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-blue/70">
-                  Acabado
-                </label>
-                <div className="mt-2 inline-flex p-1 bg-brand-gray-soft rounded-xl">
-                  {(["Mate", "Semimate"] as const).map((f) => (
-                    <button
-                      key={f}
-                      onClick={() => setFinish(f)}
-                      className={`px-4 py-1.5 text-sm rounded-lg font-medium transition-all ${
-                        finish === f
-                          ? "bg-white text-brand-blue shadow-card"
-                          : "text-muted-foreground hover:text-brand-blue"
-                      }`}
-                    >
-                      {f}
-                    </button>
-                  ))}
+              {/* Acabado + Cobertura */}
+              <div className="mt-5 grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-blue/70">
+                    Acabado
+                  </label>
+                  <div className="mt-2 inline-flex p-1 bg-brand-gray-soft rounded-xl w-full">
+                    {(["Mate", "Semimate"] as const).map((f) => (
+                      <button
+                        key={f}
+                        onClick={() => setFinish(f)}
+                        className={`flex-1 px-2 py-1.5 text-xs rounded-lg font-medium transition-all ${
+                          finish === f
+                            ? "bg-white text-brand-blue shadow-card"
+                            : "text-muted-foreground hover:text-brand-blue"
+                        }`}
+                      >
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-blue/70">
+                    Cobertura
+                  </label>
+                  <div className="mt-2 inline-flex p-1 bg-brand-gray-soft rounded-xl w-full">
+                    {(["Sutil", "Natural", "Intenso"] as const).map((c) => (
+                      <button
+                        key={c}
+                        onClick={() => setCoverage(c)}
+                        className={`flex-1 px-1.5 py-1.5 text-xs rounded-lg font-medium transition-all ${
+                          coverage === c
+                            ? "bg-white text-brand-blue shadow-card"
+                            : "text-muted-foreground hover:text-brand-blue"
+                        }`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
+
 
               <a
                 href={`${WHATSAPP_URL}&text=${encodeURIComponent(
