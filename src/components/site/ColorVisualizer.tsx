@@ -390,50 +390,17 @@ export function ColorVisualizer() {
                 loading="lazy"
               />
 
-              {/* Wall-only color overlay (masked) */}
-              {!comparing && (() => {
-                  const maskStyle: React.CSSProperties = {
-                  WebkitMaskImage: `url(${activeRoom.mask})`,
-                  maskImage: `url(${activeRoom.mask})`,
-                  WebkitMaskSize: "100% 100%",
-                  maskSize: "100% 100%",
-                  WebkitMaskRepeat: "no-repeat",
-                  maskRepeat: "no-repeat",
-                    WebkitMaskPosition: "center",
-                    maskPosition: "center",
-                };
-                return (
-                  <>
-                    {/* Thin paint coat — prevents unpainted gaps without flattening the photo */}
-                    <div
-                      className="absolute inset-0 pointer-events-none transition-[background-color,opacity] duration-300 ease-out"
-                      style={{
-                        backgroundColor: selectedColor.hex,
-                        opacity: baseOpacity,
-                        ...maskStyle,
-                      }}
-                    />
-                    {/* Pigment depth — subtle only, so shadows stay natural */}
-                    <div
-                      className="absolute inset-0 pointer-events-none mix-blend-multiply transition-[background-color,opacity] duration-300 ease-out"
-                      style={{
-                        backgroundColor: selectedColor.hex,
-                        opacity: multiplyOpacity,
-                        ...maskStyle,
-                      }}
-                    />
-                    {/* Hue transfer — preserves original wall luminance for realistic paint */}
-                    <div
-                      className="absolute inset-0 pointer-events-none mix-blend-color transition-[background-color,opacity] duration-300 ease-out"
-                      style={{
-                        backgroundColor: selectedColor.hex,
-                        opacity: colorBlendOpacity,
-                        ...maskStyle,
-                      }}
-                    />
-                  </>
-                );
-              })()}
+              {/* Wall-only rendered paint layer */}
+              {!comparing && paintedPreview && (
+                <img
+                  src={paintedPreview}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 size-full object-cover pointer-events-none transition-opacity duration-300 ease-out"
+                  width={1280}
+                  height={832}
+                />
+              )}
 
 
               {/* Top bar */}
