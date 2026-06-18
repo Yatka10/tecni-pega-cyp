@@ -244,41 +244,49 @@ export function ColorVisualizer() {
               />
 
               {/* Wall-only color overlay (masked) */}
-              {!comparing && (
-                <>
-                  {/* Multiply layer keeps shadows */}
-                  <div
-                    className="absolute inset-0 pointer-events-none mix-blend-multiply transition-[background-color,opacity] duration-500 ease-out"
-                    style={{
-                      backgroundColor: selectedColor.hex,
-                      opacity: overlayOpacity,
-                      WebkitMaskImage: `url(${activeRoom.mask})`,
-                      maskImage: `url(${activeRoom.mask})`,
-                      WebkitMaskSize: "100% 100%",
-                      maskSize: "100% 100%",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskRepeat: "no-repeat",
-                      ...({ WebkitMaskMode: "luminance", maskMode: "luminance" } as React.CSSProperties),
-                    }}
-                  />
-                  {/* Tiny tint layer to bring color closer to selected hex on very dark walls */}
-                  <div
-                    className="absolute inset-0 pointer-events-none mix-blend-color transition-[background-color] duration-500 ease-out"
-                    style={{
-                      backgroundColor: selectedColor.hex,
-                      opacity: 0.7,
-                      WebkitMaskImage: `url(${activeRoom.mask})`,
-                      maskImage: `url(${activeRoom.mask})`,
-                      WebkitMaskSize: "100% 100%",
-                      maskSize: "100% 100%",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskRepeat: "no-repeat",
-                      ...({ WebkitMaskMode: "luminance", maskMode: "luminance" } as React.CSSProperties),
-                    }}
-                  />
+              {!comparing && (() => {
+                const maskStyle: React.CSSProperties = {
+                  WebkitMaskImage: `url(${activeRoom.mask})`,
+                  maskImage: `url(${activeRoom.mask})`,
+                  WebkitMaskSize: "100% 100%",
+                  maskSize: "100% 100%",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskRepeat: "no-repeat",
+                  ...({ WebkitMaskMode: "luminance", maskMode: "luminance" } as React.CSSProperties),
+                };
+                return (
+                  <>
+                    {/* Solid base — guarantees full coverage on walls */}
+                    <div
+                      className="absolute inset-0 pointer-events-none transition-[background-color] duration-500 ease-out"
+                      style={{
+                        backgroundColor: selectedColor.hex,
+                        opacity: finish === "Mate" ? 0.55 : 0.42,
+                        ...maskStyle,
+                      }}
+                    />
+                    {/* Multiply layer keeps the wall's lighting and shadows */}
+                    <div
+                      className="absolute inset-0 pointer-events-none mix-blend-multiply transition-[background-color,opacity] duration-500 ease-out"
+                      style={{
+                        backgroundColor: selectedColor.hex,
+                        opacity: overlayOpacity,
+                        ...maskStyle,
+                      }}
+                    />
+                    {/* Color layer locks the hue against the real wall texture */}
+                    <div
+                      className="absolute inset-0 pointer-events-none mix-blend-color transition-[background-color] duration-500 ease-out"
+                      style={{
+                        backgroundColor: selectedColor.hex,
+                        opacity: 0.85,
+                        ...maskStyle,
+                      }}
+                    />
+                  </>
+                );
+              })()}
 
-                </>
-              )}
 
               {/* Top bar */}
               <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2">
