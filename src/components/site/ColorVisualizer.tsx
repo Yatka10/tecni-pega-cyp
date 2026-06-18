@@ -258,7 +258,7 @@ export function ColorVisualizer() {
                       maskSize: "100% 100%",
                       WebkitMaskRepeat: "no-repeat",
                       maskRepeat: "no-repeat",
-                      WebkitMaskMode: "luminance" as any,
+                      ("WebkitMaskMode" as any): "luminance",
                       maskMode: "luminance" as any,
                     }}
                   />
@@ -274,7 +274,7 @@ export function ColorVisualizer() {
                       maskSize: "100% 100%",
                       WebkitMaskRepeat: "no-repeat",
                       maskRepeat: "no-repeat",
-                      WebkitMaskMode: "luminance" as any,
+                      ("WebkitMaskMode" as any): "luminance",
                       maskMode: "luminance" as any,
                     }}
                   />
