@@ -97,33 +97,40 @@ export function HeroSlider() {
       ))}
 
       {/* content */}
-      <div className="container-x relative h-full flex flex-col justify-center pt-20 pb-14">
-        <div className="max-w-3xl">
-          <span className="chip !bg-white/10 !text-white !border-white/25 backdrop-blur">
-            {slides[idx].kicker}
-          </span>
-          <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.02] tracking-tight">
-            {slides[idx].title}{" "}
-            <span className={slides[idx].accent}>{slides[idx].highlight}</span>
-          </h1>
-          <p className="mt-5 text-lg md:text-xl text-white/90 max-w-2xl leading-relaxed">
-            {slides[idx].desc}
-          </p>
+      {(() => {
+        const s = slides[idx];
+        const PrimaryIcon = s.ctaPrimary.Icon;
+        const SecondaryIcon = s.ctaSecondary?.Icon;
+        return (
+          <div className="container-x relative h-full flex flex-col justify-center pt-20 pb-14">
+            <div className="max-w-3xl">
+              <span className="chip !bg-white/10 !text-white !border-white/25 backdrop-blur">
+                {s.kicker}
+              </span>
+              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.02] tracking-tight">
+                {s.title}{" "}
+                <span className={s.accent}>{s.highlight}</span>
+              </h1>
+              <p className="mt-5 text-lg md:text-xl text-white/90 max-w-2xl leading-relaxed">
+                {s.desc}
+              </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href={slides[idx].ctaPrimary.href} className="btn-primary">
-              <slides[idx].ctaPrimary.Icon className="size-5" />
-              {slides[idx].ctaPrimary.label}
-            </a>
-            {slides[idx].ctaSecondary && (
-              <a href={slides[idx].ctaSecondary!.href} className="btn-outline-white">
-                <slides[idx].ctaSecondary!.Icon className="size-5" />
-                {slides[idx].ctaSecondary!.label}
-              </a>
-            )}
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href={s.ctaPrimary.href} className="btn-primary">
+                  <PrimaryIcon className="size-5" />
+                  {s.ctaPrimary.label}
+                </a>
+                {s.ctaSecondary && SecondaryIcon && (
+                  <a href={s.ctaSecondary.href} className="btn-outline-white">
+                    <SecondaryIcon className="size-5" />
+                    {s.ctaSecondary.label}
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* controls */}
       <button
