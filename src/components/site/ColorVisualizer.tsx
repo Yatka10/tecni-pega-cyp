@@ -286,7 +286,7 @@ export function ColorVisualizer() {
                       className="absolute inset-0 pointer-events-none transition-[background-color] duration-500 ease-out"
                       style={{
                         backgroundColor: selectedColor.hex,
-                        opacity: finish === "Mate" ? 0.55 : 0.42,
+                        opacity: baseOpacity,
                         ...maskStyle,
                       }}
                     />
@@ -295,7 +295,7 @@ export function ColorVisualizer() {
                       className="absolute inset-0 pointer-events-none mix-blend-multiply transition-[background-color,opacity] duration-500 ease-out"
                       style={{
                         backgroundColor: selectedColor.hex,
-                        opacity: overlayOpacity,
+                        opacity: multiplyOpacity,
                         ...maskStyle,
                       }}
                     />
@@ -304,7 +304,8 @@ export function ColorVisualizer() {
                       className="absolute inset-0 pointer-events-none mix-blend-color transition-[background-color] duration-500 ease-out"
                       style={{
                         backgroundColor: selectedColor.hex,
-                        opacity: 0.85,
+                        opacity: colorBlendOpacity,
+
                         ...maskStyle,
                       }}
                     />
