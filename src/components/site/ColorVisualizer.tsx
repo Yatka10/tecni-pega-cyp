@@ -49,18 +49,42 @@ const productOptions = [
   "Grano Fachada",
 ];
 
+type Coverage = "Sutil" | "Natural" | "Intenso";
+
+// Perceived lightness of a hex (0–1)
+function hexLightness(hex: string) {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16) / 255;
+  const g = parseInt(h.slice(2, 4), 16) / 255;
+  const b = parseInt(h.slice(4, 6), 16) / 255;
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
 export function ColorVisualizer() {
   const [product, setProduct] = useState(productOptions[0]);
   const [colorIdx, setColorIdx] = useState(0);
   const [room, setRoom] = useState<RoomKey>("sala");
   const [finish, setFinish] = useState<"Mate" | "Semimate">("Mate");
+  const [coverage, setCoverage] = useState<Coverage>("Natural");
   const [comparing, setComparing] = useState(false);
 
   const selectedColor = colors[colorIdx];
   const activeRoom = rooms.find((r) => r.key === room)!;
 
-  // Stronger coverage on Mate, lighter on Semimate. Multiply preserves wall shading.
-  const overlayOpacity = finish === "Mate" ? 0.95 : 0.82;
+  // Realism calibration: darker pigments need more solid base, lighter ones less.
+  // Mate adds opacity; Semimate keeps more of the wall's reflective sheen.
+  const L = hexLightness(selectedColor.hex);
+  const coverageFactor = coverage === "Sutil" ? 0.78 : coverage === "Intenso" ? 1.12 : 1;
+  const finishBoost = finish === "Mate" ? 0.06 : -0.04;
+  const baseOpacity = Math.max(
+    0.32,
+    Math.min(0.85, (0.48 + (1 - L) * 0.35 + finishBoost) * coverageFactor)
+  );
+  const multiplyOpacity = Math.max(
+    0.55,
+    Math.min(1, (0.78 + finishBoost) * coverageFactor)
+  );
+  const colorBlendOpacity = Math.max(0.55, Math.min(1, 0.9 * coverageFactor));
 
   const groupedColors = useMemo(() => {
     return colorFamilies.map((f) => ({
@@ -68,6 +92,7 @@ export function ColorVisualizer() {
       items: colors.map((c, i) => ({ ...c, i })).filter((c) => c.family === f),
     }));
   }, []);
+
 
   return (
     <section
