@@ -165,18 +165,25 @@ export function ColorVisualizer() {
 
   const selectedColor = colors[colorIdx];
   const activeRoom = rooms.find((r) => r.key === room)!;
+  const [paintedPreview, setPaintedPreview] = useState<string | null>(null);
 
-  // Realism calibration: color blend preserves wall light/shadow; solid paint is only a thin coat.
-  // This avoids the fake flat overlay while keeping full wall coverage.
-  const L = hexLightness(selectedColor.hex);
-  const coverageFactor = coverage === "Sutil" ? 0.9 : coverage === "Intenso" ? 1.08 : 1;
-  const finishBoost = finish === "Mate" ? 0.03 : -0.03;
-  const baseOpacity = Math.max(
-    0.12,
-    Math.min(0.34, (0.18 + (1 - L) * 0.12 + finishBoost) * coverageFactor)
-  );
-  const multiplyOpacity = Math.max(0.1, Math.min(0.32, (0.16 + (1 - L) * 0.1) * coverageFactor));
-  const colorBlendOpacity = Math.max(0.62, Math.min(0.88, (0.74 + finishBoost) * coverageFactor));
+  useEffect(() => {
+    let cancelled = false;
+    setPaintedPreview(null);
+    renderPaintedWalls({
+      photoSrc: activeRoom.img,
+      maskSrc: activeRoom.mask,
+      color: selectedColor.hex,
+      finish,
+      coverage,
+    }).then((preview) => {
+      if (!cancelled) setPaintedPreview(preview);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeRoom.img, activeRoom.mask, coverage, finish, selectedColor.hex]);
 
   const groupedColors = useMemo(() => {
     return colorFamilies.map((f) => ({
