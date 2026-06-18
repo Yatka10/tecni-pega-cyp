@@ -71,20 +71,17 @@ export function ColorVisualizer() {
   const selectedColor = colors[colorIdx];
   const activeRoom = rooms.find((r) => r.key === room)!;
 
-  // Realism calibration: darker pigments need more solid base, lighter ones less.
-  // Mate adds opacity; Semimate keeps more of the wall's reflective sheen.
+  // Realism calibration: color blend preserves wall light/shadow; solid paint is only a thin coat.
+  // This avoids the fake flat overlay while keeping full wall coverage.
   const L = hexLightness(selectedColor.hex);
-  const coverageFactor = coverage === "Sutil" ? 0.78 : coverage === "Intenso" ? 1.12 : 1;
-  const finishBoost = finish === "Mate" ? 0.06 : -0.04;
+  const coverageFactor = coverage === "Sutil" ? 0.9 : coverage === "Intenso" ? 1.08 : 1;
+  const finishBoost = finish === "Mate" ? 0.03 : -0.03;
   const baseOpacity = Math.max(
-    0.32,
-    Math.min(0.85, (0.48 + (1 - L) * 0.35 + finishBoost) * coverageFactor)
+    0.12,
+    Math.min(0.34, (0.18 + (1 - L) * 0.12 + finishBoost) * coverageFactor)
   );
-  const multiplyOpacity = Math.max(
-    0.55,
-    Math.min(1, (0.78 + finishBoost) * coverageFactor)
-  );
-  const colorBlendOpacity = Math.max(0.55, Math.min(1, 0.9 * coverageFactor));
+  const multiplyOpacity = Math.max(0.1, Math.min(0.32, (0.16 + (1 - L) * 0.1) * coverageFactor));
+  const colorBlendOpacity = Math.max(0.62, Math.min(0.88, (0.74 + finishBoost) * coverageFactor));
 
   const groupedColors = useMemo(() => {
     return colorFamilies.map((f) => ({
@@ -279,7 +276,7 @@ export function ColorVisualizer() {
               ))}
             </div>
 
-            <div className="relative aspect-[16/10] rounded-3xl overflow-hidden shadow-[0_30px_60px_-30px_hsl(var(--brand-blue)/0.45)] border border-border bg-black group">
+            <div className="relative aspect-[20/13] rounded-3xl overflow-hidden shadow-[0_30px_60px_-30px_hsl(var(--brand-blue)/0.45)] border border-border bg-black group">
               {/* Base photo */}
               <img
                 key={activeRoom.key}
@@ -293,42 +290,42 @@ export function ColorVisualizer() {
 
               {/* Wall-only color overlay (masked) */}
               {!comparing && (() => {
-                const maskStyle: React.CSSProperties = {
+                  const maskStyle: React.CSSProperties = {
                   WebkitMaskImage: `url(${activeRoom.mask})`,
                   maskImage: `url(${activeRoom.mask})`,
                   WebkitMaskSize: "100% 100%",
                   maskSize: "100% 100%",
                   WebkitMaskRepeat: "no-repeat",
                   maskRepeat: "no-repeat",
-                  ...({ WebkitMaskMode: "luminance", maskMode: "luminance" } as React.CSSProperties),
+                    WebkitMaskPosition: "center",
+                    maskPosition: "center",
                 };
                 return (
                   <>
-                    {/* Solid base — guarantees full coverage on walls */}
+                    {/* Thin paint coat — prevents unpainted gaps without flattening the photo */}
                     <div
-                      className="absolute inset-0 pointer-events-none transition-[background-color] duration-500 ease-out"
+                      className="absolute inset-0 pointer-events-none transition-[background-color,opacity] duration-300 ease-out"
                       style={{
                         backgroundColor: selectedColor.hex,
                         opacity: baseOpacity,
                         ...maskStyle,
                       }}
                     />
-                    {/* Multiply layer keeps the wall's lighting and shadows */}
+                    {/* Pigment depth — subtle only, so shadows stay natural */}
                     <div
-                      className="absolute inset-0 pointer-events-none mix-blend-multiply transition-[background-color,opacity] duration-500 ease-out"
+                      className="absolute inset-0 pointer-events-none mix-blend-multiply transition-[background-color,opacity] duration-300 ease-out"
                       style={{
                         backgroundColor: selectedColor.hex,
                         opacity: multiplyOpacity,
                         ...maskStyle,
                       }}
                     />
-                    {/* Color layer locks the hue against the real wall texture */}
+                    {/* Hue transfer — preserves original wall luminance for realistic paint */}
                     <div
-                      className="absolute inset-0 pointer-events-none mix-blend-color transition-[background-color] duration-500 ease-out"
+                      className="absolute inset-0 pointer-events-none mix-blend-color transition-[background-color,opacity] duration-300 ease-out"
                       style={{
                         backgroundColor: selectedColor.hex,
                         opacity: colorBlendOpacity,
-
                         ...maskStyle,
                       }}
                     />
