@@ -206,7 +206,7 @@ export function ColorVisualizer() {
               </div>
             </div>
 
-            <div className="grid grid-cols-5 gap-3 sm:gap-3.5">
+            <div className="grid grid-cols-6 sm:grid-cols-7 md:grid-cols-8 gap-2 sm:gap-2.5">
               {colors.map((c, i) => {
                 const active = colorIdx === i;
                 const light = hexLightness(c.hex) > 0.78;
@@ -217,23 +217,26 @@ export function ColorVisualizer() {
                     onMouseEnter={() => setHoverIdx(i)}
                     onMouseLeave={() => setHoverIdx((v) => (v === i ? null : v))}
                     aria-label={`${c.name} — ${c.ref}`}
-                    className={`group relative aspect-square rounded-2xl transition-all duration-200 ${
+                    style={{
+                      background: c.hex,
+                      animationDelay: `${i * 22}ms`,
+                    }}
+                    className={`group relative aspect-square rounded-xl transition-all duration-300 ease-out animate-scale-in will-change-transform ${
                       active
-                        ? "ring-2 ring-brand-blue ring-offset-2 ring-offset-[#FBF8F2] scale-[1.04]"
-                        : "ring-1 ring-black/5 hover:scale-[1.06] hover:shadow-card-hover"
-                    } ${light ? "ring-black/10" : ""}`}
-                    style={{ background: c.hex }}
+                        ? "ring-2 ring-brand-blue ring-offset-2 ring-offset-[#FBF8F2] scale-110 shadow-[0_10px_24px_-10px_rgba(0,0,0,0.35)]"
+                        : "ring-1 ring-black/5 hover:scale-[1.15] hover:-translate-y-0.5 hover:shadow-[0_8px_18px_-8px_rgba(0,0,0,0.3)] hover:z-10"
+                    } ${light && !active ? "ring-black/10" : ""}`}
                   >
                     {active && (
                       <Check
-                        className={`absolute inset-0 m-auto size-5 ${
+                        className={`absolute inset-0 m-auto size-4 animate-scale-in ${
                           light ? "text-brand-blue" : "text-white drop-shadow"
                         }`}
                         strokeWidth={3}
                       />
                     )}
                     {/* Tooltip */}
-                    <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-9 whitespace-nowrap rounded-md bg-neutral-900 text-white text-[11px] font-medium px-2.5 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg">
+                    <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-9 whitespace-nowrap rounded-md bg-neutral-900 text-white text-[11px] font-semibold px-2.5 py-1 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 z-20 shadow-lg">
                       {c.name}
                       <span className="absolute left-1/2 -translate-x-1/2 -bottom-1 size-2 rotate-45 bg-neutral-900" />
                     </span>
