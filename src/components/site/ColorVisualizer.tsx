@@ -159,34 +159,44 @@ export function ColorVisualizer() {
         <div className="mt-12 grid gap-8 lg:grid-cols-2 lg:items-start">
           {/* Preview */}
           <div className="relative">
-            <div className="relative aspect-[5/4] rounded-3xl overflow-hidden shadow-[0_30px_60px_-30px_hsl(var(--brand-blue)/0.45)] border border-border bg-neutral-100">
+            <div className="group relative aspect-[5/4] rounded-3xl overflow-hidden shadow-[0_30px_60px_-30px_hsl(var(--brand-blue)/0.45)] border border-border bg-neutral-100">
               <img
                 src={sala}
                 alt="Ambiente sala"
-                className="absolute inset-0 size-full object-cover"
+                className="absolute inset-0 size-full object-cover transition-transform duration-[6000ms] ease-out group-hover:scale-[1.04]"
                 width={1280}
                 height={1024}
                 loading="lazy"
               />
               {painted && (
                 <img
+                  key={selected.hex}
                   src={painted}
                   alt=""
                   aria-hidden
-                  className="absolute inset-0 size-full object-cover pointer-events-none transition-opacity duration-300"
+                  className="absolute inset-0 size-full object-cover pointer-events-none animate-fade-in transition-transform duration-[6000ms] ease-out group-hover:scale-[1.04]"
                 />
               )}
+              {/* Glow watermark of selected color */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-16 -right-16 size-48 rounded-full blur-3xl opacity-40 transition-colors duration-500"
+                style={{ background: selected.hex }}
+              />
             </div>
 
             {/* Floating product chip */}
-            <div className="absolute left-1/2 -translate-x-1/2 -bottom-5 bg-white rounded-2xl border border-border shadow-card px-4 py-2.5 flex items-center gap-3 min-w-[230px]">
+            <div
+              key={selected.ref}
+              className="absolute left-1/2 -translate-x-1/2 -bottom-5 bg-white rounded-2xl border border-border shadow-card px-4 py-2.5 flex items-center gap-3 min-w-[240px] animate-fade-in"
+            >
               <div
-                className="size-9 rounded-lg border border-border shrink-0"
+                className="size-9 rounded-lg border border-border shrink-0 transition-colors duration-300"
                 style={{ background: selected.hex }}
               />
               <div className="min-w-0">
                 <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-blue/60">
-                  TECNI-COLOR
+                  TECNI-COLOR · {selected.ref}
                 </div>
                 <div className="text-sm font-bold text-brand-blue truncate">
                   {selected.name}
