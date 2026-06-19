@@ -1,59 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Palette,
-  Sofa,
-  BedDouble,
-  UtensilsCrossed,
-  Building2,
-  Briefcase,
-  Share2,
-  MessageCircle,
-  Eye,
-  Sparkles,
-} from "lucide-react";
-import { colors, colorFamilies } from "@/lib/colors";
+import { Check, Sparkles, ArrowRight } from "lucide-react";
+import { colors } from "@/lib/colors";
 import { WHATSAPP_URL } from "@/lib/products";
 
 import sala from "@/assets/rooms/sala.jpg";
-import habitacion from "@/assets/rooms/habitacion.jpg";
-import cocina from "@/assets/rooms/cocina.jpg";
-import fachada from "@/assets/rooms/fachada.jpg";
-import oficina from "@/assets/rooms/oficina.jpg";
-
 import salaMask from "@/assets/rooms/sala-mask.png";
-import habitacionMask from "@/assets/rooms/habitacion-mask.png";
-import cocinaMask from "@/assets/rooms/cocina-mask.png";
-import fachadaMask from "@/assets/rooms/fachada-mask.png";
-import oficinaMask from "@/assets/rooms/oficina-mask.png";
 
-type RoomKey = "sala" | "habitacion" | "cocina" | "fachada" | "oficina";
-
-const rooms: {
-  key: RoomKey;
-  label: string;
-  img: string;
-  mask: string;
-  Icon: typeof Sofa;
-}[] = [
-  { key: "sala", label: "Sala", img: sala, mask: salaMask, Icon: Sofa },
-  { key: "habitacion", label: "Habitación", img: habitacion, mask: habitacionMask, Icon: BedDouble },
-  { key: "cocina", label: "Cocina", img: cocina, mask: cocinaMask, Icon: UtensilsCrossed },
-  { key: "fachada", label: "Fachada", img: fachada, mask: fachadaMask, Icon: Building2 },
-  { key: "oficina", label: "Oficina", img: oficina, mask: oficinaMask, Icon: Briefcase },
-];
-
-const productOptions = [
-  "Pintura Vinílica Tipo 1",
-  "Pintura Vinílica Tipo 2",
-  "Estuco Acrílico",
-  "Grano Fachada",
-];
-
-type Coverage = "Sutil" | "Natural" | "Intenso";
+type Product = "Pinturas" | "Estucos";
 
 type RGB = { r: number; g: number; b: number };
 
-const clamp = (value: number, min = 0, max = 255) => Math.max(min, Math.min(max, value));
+const clamp = (v: number, min = 0, max = 255) => Math.max(min, Math.min(max, v));
 
 function hexToRgb(hex: string): RGB {
   const h = hex.replace("#", "");
@@ -64,7 +21,7 @@ function hexToRgb(hex: string): RGB {
   };
 }
 
-function loadPaintImage(src: string) {
+function loadImage(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -74,20 +31,8 @@ function loadPaintImage(src: string) {
   });
 }
 
-async function renderPaintedWalls({
-  photoSrc,
-  maskSrc,
-  color,
-  finish,
-  coverage,
-}: {
-  photoSrc: string;
-  maskSrc: string;
-  color: string;
-  finish: "Mate" | "Semimate";
-  coverage: Coverage;
-}) {
-  const [photo, mask] = await Promise.all([loadPaintImage(photoSrc), loadPaintImage(maskSrc)]);
+async function renderPaintedWalls(photoSrc: string, maskSrc: string, color: string) {
+  const [photo, mask] = await Promise.all([loadImage(photoSrc), loadImage(maskSrc)]);
   const width = photo.naturalWidth;
   const height = photo.naturalHeight;
   const canvas = document.createElement("canvas");
@@ -106,11 +51,6 @@ async function renderPaintedWalls({
   const maskData = maskCtx.getImageData(0, 0, width, height).data;
   const data = imageData.data;
   const target = hexToRgb(color);
-  const pigmentLightness = hexLightness(color);
-  const coverageStrength = coverage === "Sutil" ? 0.72 : coverage === "Intenso" ? 0.9 : 0.82;
-  const finishHighlight = finish === "Semimate" ? 0.4 : 0.26;
-  const surfaceRetention = finish === "Semimate" ? 0.18 : 0.12;
-  const pigmentCorrection = pigmentLightness > 0.72 ? 0.78 : pigmentLightness < 0.28 ? 0.92 : 0.86;
 
   for (let i = 0; i < data.length; i += 4) {
     const maskAlpha = maskData[i + 3] / 255;
@@ -119,26 +59,21 @@ async function renderPaintedWalls({
       continue;
     }
 
-    const originalR = data[i];
-    const originalG = data[i + 1];
-    const originalB = data[i + 2];
-    const luminance = (0.2126 * originalR + 0.7152 * originalG + 0.0722 * originalB) / 255;
-    const wallLight = clamp((luminance - 0.48) * 1.12 + 0.52, 0, 1);
-    const shade = 0.56 + wallLight * 0.66;
-    const highlight = Math.max(0, wallLight - 0.68) * finishHighlight;
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    const shade = 0.6 + (clamp((luminance - 0.48) * 1.12 + 0.52, 0, 1)) * 0.62;
+    const highlight = Math.max(0, luminance - 0.78) * 0.3;
 
-    let paintR = clamp(target.r * shade + 255 * highlight);
-    let paintG = clamp(target.g * shade + 255 * highlight);
-    let paintB = clamp(target.b * shade + 255 * highlight);
+    const paintR = clamp(target.r * shade + 255 * highlight);
+    const paintG = clamp(target.g * shade + 255 * highlight);
+    const paintB = clamp(target.b * shade + 255 * highlight);
 
-    paintR = paintR * (1 - surfaceRetention) + originalR * surfaceRetention;
-    paintG = paintG * (1 - surfaceRetention) + originalG * surfaceRetention;
-    paintB = paintB * (1 - surfaceRetention) + originalB * surfaceRetention;
-
-    const strength = coverageStrength * pigmentCorrection;
-    data[i] = clamp(originalR * (1 - strength) + paintR * strength);
-    data[i + 1] = clamp(originalG * (1 - strength) + paintG * strength);
-    data[i + 2] = clamp(originalB * (1 - strength) + paintB * strength);
+    const strength = 0.86;
+    data[i] = clamp(r * (1 - strength) + paintR * strength);
+    data[i + 1] = clamp(g * (1 - strength) + paintG * strength);
+    data[i + 2] = clamp(b * (1 - strength) + paintB * strength);
     data[i + 3] = Math.round(255 * maskAlpha);
   }
 
@@ -146,7 +81,6 @@ async function renderPaintedWalls({
   return canvas.toDataURL("image/webp", 0.92);
 }
 
-// Perceived lightness of a hex (0–1)
 function hexLightness(hex: string) {
   const h = hex.replace("#", "");
   const r = parseInt(h.slice(0, 2), 16) / 255;
@@ -156,324 +90,176 @@ function hexLightness(hex: string) {
 }
 
 export function ColorVisualizer() {
-  const [product, setProduct] = useState(productOptions[0]);
-  const [colorIdx, setColorIdx] = useState(0);
-  const [room, setRoom] = useState<RoomKey>("sala");
-  const [finish, setFinish] = useState<"Mate" | "Semimate">("Mate");
-  const [coverage, setCoverage] = useState<Coverage>("Natural");
-  const [comparing, setComparing] = useState(false);
+  const [product, setProduct] = useState<Product>("Pinturas");
+  const [colorIdx, setColorIdx] = useState(6); // Azul Mediterráneo as default
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const [painted, setPainted] = useState<string | null>(null);
 
-  const selectedColor = colors[colorIdx];
-  const activeRoom = rooms.find((r) => r.key === room)!;
-  const [paintedPreview, setPaintedPreview] = useState<string | null>(null);
+  const selected = colors[colorIdx];
 
   useEffect(() => {
     let cancelled = false;
-    setPaintedPreview(null);
-    renderPaintedWalls({
-      photoSrc: activeRoom.img,
-      maskSrc: activeRoom.mask,
-      color: selectedColor.hex,
-      finish,
-      coverage,
-    }).then((preview) => {
-      if (!cancelled) setPaintedPreview(preview);
+    setPainted(null);
+    renderPaintedWalls(sala, salaMask, selected.hex).then((url) => {
+      if (!cancelled) setPainted(url);
     });
-
     return () => {
       cancelled = true;
     };
-  }, [activeRoom.img, activeRoom.mask, coverage, finish, selectedColor.hex]);
+  }, [selected.hex]);
 
-  const groupedColors = useMemo(() => {
-    return colorFamilies.map((f) => ({
-      family: f,
-      items: colors.map((c, i) => ({ ...c, i })).filter((c) => c.family === f),
-    }));
-  }, []);
+  const tooltipColor = hoverIdx !== null ? colors[hoverIdx] : null;
 
+  const ctaHref = useMemo(
+    () =>
+      `${WHATSAPP_URL}&text=${encodeURIComponent(
+        `Hola TECNI-PEGA, me interesa ${product === "Pinturas" ? "la pintura" : "el estuco"} en color ${selected.name} (${selected.ref}).`,
+      )}`,
+    [product, selected],
+  );
 
   return (
     <section
       id="visualizador"
-      className="relative py-24 overflow-hidden bg-[radial-gradient(1200px_500px_at_10%_-10%,hsl(var(--brand-blue)/0.08),transparent_60%),radial-gradient(900px_400px_at_100%_0%,hsl(var(--brand-red)/0.06),transparent_60%),linear-gradient(180deg,#fff_0%,hsl(var(--brand-blue-soft)/0.6)_100%)]"
+      className="relative py-20 md:py-24 overflow-hidden bg-[radial-gradient(900px_400px_at_50%_-10%,hsl(var(--brand-blue)/0.06),transparent_60%),linear-gradient(180deg,#FBF8F2_0%,#F7F3EA_100%)]"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-blue/30 to-transparent"
-      />
-
       <div className="container-x">
-        <div className="max-w-2xl">
-          <span className="chip">
-            <Sparkles className="size-3 mr-1" /> Herramienta exclusiva TECNI-COLOR
+        {/* Header centrado */}
+        <div className="max-w-2xl mx-auto text-center">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-brand-red">
+            <Sparkles className="size-3" /> Visualizador en vivo
           </span>
-          <h2 className="mt-3 text-3xl md:text-5xl font-extrabold text-brand-blue tracking-tight">
-            Pinta tus muros{" "}
-            <span className="text-brand-red">— antes de aplicar la pintura</span>
+          <h2 className="mt-3 text-3xl md:text-5xl font-extrabold tracking-tight text-brand-blue">
+            Previsualiza el color <span className="block md:inline">en tu pared</span>
           </h2>
           <p className="mt-3 text-muted-foreground md:text-lg">
-            Selecciona un producto, un color y un ambiente. Solo se pintan las paredes —
-            los muebles, pisos y techos quedan intactos para que veas el resultado real.
+            Elige una pintura o un estuco y el acabado al instante sobre la pared. El color
+            se aplica solo al muro, igual que en una pintada real.
           </p>
+
+          {/* Segmented control */}
+          <div className="mt-6 inline-flex p-1 rounded-full bg-white border border-border shadow-card">
+            {(["Pinturas", "Estucos"] as Product[]).map((p) => (
+              <button
+                key={p}
+                onClick={() => setProduct(p)}
+                className={`px-6 md:px-8 py-2 text-sm font-semibold rounded-full transition-all ${
+                  product === p
+                    ? "bg-brand-blue text-white shadow-[0_6px_16px_-8px_hsl(var(--brand-blue)/0.7)]"
+                    : "text-brand-blue/70 hover:text-brand-blue"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-5">
-          {/* Left control panel */}
-          <div className="lg:col-span-2 relative rounded-3xl p-[1px] bg-gradient-to-br from-brand-blue/30 via-border to-brand-red/20 shadow-card">
-            <div className="rounded-[calc(theme(borderRadius.3xl)-1px)] bg-white p-6 md:p-7">
-              {/* Producto */}
-              <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-blue/70">
-                Producto
-              </label>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {productOptions.map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setProduct(p)}
-                    className={`text-sm rounded-xl px-3 py-2.5 border transition-all text-left font-medium ${
-                      product === p
-                        ? "bg-brand-blue text-white border-brand-blue shadow-[0_8px_24px_-12px_hsl(var(--brand-blue)/0.6)]"
-                        : "bg-white border-border hover:border-brand-blue/50 hover:bg-brand-blue-soft/40 text-brand-blue"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-
-              {/* Paleta */}
-              <div className="mt-6">
-                <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-blue/70">
-                    Paleta de colores
-                  </label>
-                  <span className="text-[11px] text-muted-foreground">
-                    {colors.length} tonos
-                  </span>
-                </div>
-                <div className="mt-3 space-y-4 max-h-80 overflow-y-auto pr-1 -mr-1">
-                  {groupedColors.map((g) => (
-                    <div key={g.family}>
-                      <div className="text-[11px] text-muted-foreground mb-1.5 font-medium">
-                        {g.family}
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {g.items.map((c) => {
-                          const active = colorIdx === c.i;
-                          return (
-                            <button
-                              key={c.ref}
-                              onClick={() => setColorIdx(c.i)}
-                              title={`${c.name} · ${c.ref}`}
-                              aria-label={c.name}
-                              className={`relative size-9 rounded-full transition-all hover:scale-110 ${
-                                active
-                                  ? "ring-2 ring-offset-2 ring-brand-blue scale-110"
-                                  : "ring-1 ring-black/5 hover:ring-brand-blue/40 shadow-card"
-                              }`}
-                              style={{ background: c.hex }}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Selected color card */}
-              <div className="mt-6 flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-br from-brand-blue-soft/60 to-white border border-border">
-                <div
-                  className="size-14 rounded-xl border border-border shrink-0 shadow-card"
-                  style={{ background: selectedColor.hex }}
+        {/* Layout principal */}
+        <div className="mt-12 grid gap-8 lg:grid-cols-2 lg:items-start">
+          {/* Preview */}
+          <div className="relative">
+            <div className="relative aspect-[5/4] rounded-3xl overflow-hidden shadow-[0_30px_60px_-30px_hsl(var(--brand-blue)/0.45)] border border-border bg-neutral-100">
+              <img
+                src={sala}
+                alt="Ambiente sala"
+                className="absolute inset-0 size-full object-cover"
+                width={1280}
+                height={1024}
+                loading="lazy"
+              />
+              {painted && (
+                <img
+                  src={painted}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 size-full object-cover pointer-events-none transition-opacity duration-300"
                 />
-                <div className="min-w-0">
-                  <div className="font-display font-bold text-brand-blue truncate">
-                    {selectedColor.name}
-                  </div>
-                  <div className="text-xs font-mono text-muted-foreground">
-                    Ref. {selectedColor.ref} · {selectedColor.hex.toUpperCase()}
-                  </div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5">
-                    Familia: {selectedColor.family}
-                  </div>
+              )}
+            </div>
+
+            {/* Floating product chip */}
+            <div className="absolute left-1/2 -translate-x-1/2 -bottom-5 bg-white rounded-2xl border border-border shadow-card px-4 py-2.5 flex items-center gap-3 min-w-[230px]">
+              <div
+                className="size-9 rounded-lg border border-border shrink-0"
+                style={{ background: selected.hex }}
+              />
+              <div className="min-w-0">
+                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-blue/60">
+                  TECNI-COLOR
+                </div>
+                <div className="text-sm font-bold text-brand-blue truncate">
+                  {selected.name}
                 </div>
               </div>
-
-              {/* Acabado + Cobertura */}
-              <div className="mt-5 grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-blue/70">
-                    Acabado
-                  </label>
-                  <div className="mt-2 inline-flex p-1 bg-brand-gray-soft rounded-xl w-full">
-                    {(["Mate", "Semimate"] as const).map((f) => (
-                      <button
-                        key={f}
-                        onClick={() => setFinish(f)}
-                        className={`flex-1 px-2 py-1.5 text-xs rounded-lg font-medium transition-all ${
-                          finish === f
-                            ? "bg-white text-brand-blue shadow-card"
-                            : "text-muted-foreground hover:text-brand-blue"
-                        }`}
-                      >
-                        {f}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-blue/70">
-                    Cobertura
-                  </label>
-                  <div className="mt-2 inline-flex p-1 bg-brand-gray-soft rounded-xl w-full">
-                    {(["Sutil", "Natural", "Intenso"] as const).map((c) => (
-                      <button
-                        key={c}
-                        onClick={() => setCoverage(c)}
-                        className={`flex-1 px-1.5 py-1.5 text-xs rounded-lg font-medium transition-all ${
-                          coverage === c
-                            ? "bg-white text-brand-blue shadow-card"
-                            : "text-muted-foreground hover:text-brand-blue"
-                        }`}
-                      >
-                        {c}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-
-              <a
-                href={`${WHATSAPP_URL}&text=${encodeURIComponent(
-                  `Hola TECNI-PEGA, quiero cotizar ${product} en color ${selectedColor.name} (${selectedColor.ref}), acabado ${finish}.`
-                )}`}
-                target="_blank"
-                rel="noopener"
-                className="btn-primary w-full mt-6"
-              >
-                <MessageCircle className="size-4" /> Cotizar este color
-              </a>
             </div>
           </div>
 
-          {/* Right preview */}
-          <div className="lg:col-span-3">
-            <div className="flex flex-wrap gap-2 mb-3">
-              {rooms.map((r) => (
-                <button
-                  key={r.key}
-                  onClick={() => setRoom(r.key)}
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium border transition-all ${
-                    room === r.key
-                      ? "bg-brand-blue text-white border-brand-blue shadow-[0_8px_24px_-12px_hsl(var(--brand-blue)/0.6)]"
-                      : "bg-white text-brand-blue border-border hover:border-brand-blue/50 hover:bg-brand-blue-soft/40"
-                  }`}
-                >
-                  <r.Icon className="size-4" />
-                  {r.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="relative aspect-[20/13] rounded-3xl overflow-hidden shadow-[0_30px_60px_-30px_hsl(var(--brand-blue)/0.45)] border border-border bg-black group">
-              {/* Base photo */}
-              <img
-                key={activeRoom.key}
-                src={activeRoom.img}
-                alt={`Ambiente ${activeRoom.label}`}
-                className="absolute inset-0 size-full object-cover"
-                width={1280}
-                height={832}
-                loading="lazy"
-              />
-
-              {/* Wall-only rendered paint layer */}
-              {!comparing && paintedPreview && (
-                <img
-                  src={paintedPreview}
-                  alt=""
-                  aria-hidden
-                  className="absolute inset-0 size-full object-cover pointer-events-none transition-opacity duration-300 ease-out"
-                  width={1280}
-                  height={832}
-                />
-              )}
-
-
-              {/* Top bar */}
-              <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2">
-                <div className="bg-white/95 backdrop-blur rounded-lg px-3 py-1.5 text-[11px] text-brand-blue font-medium shadow-card max-w-[70%]">
-                  Vista previa real — solo se pintan las paredes.
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onMouseDown={() => setComparing(true)}
-                    onMouseUp={() => setComparing(false)}
-                    onMouseLeave={() => setComparing(false)}
-                    onTouchStart={() => setComparing(true)}
-                    onTouchEnd={() => setComparing(false)}
-                    className="bg-white/95 hover:bg-white text-brand-blue rounded-lg px-3 py-1.5 text-[11px] font-medium shadow-card inline-flex items-center gap-1.5"
-                    aria-label="Mantén presionado para comparar"
-                  >
-                    <Eye className="size-3.5" />
-                    {comparing ? "Antes" : "Comparar"}
-                  </button>
-                  <button
-                    className="bg-brand-blue/95 hover:bg-brand-blue text-white rounded-lg px-3 py-1.5 text-[11px] font-medium shadow-card inline-flex items-center gap-1.5"
-                    onClick={() => {
-                      if (typeof navigator !== "undefined" && navigator.share) {
-                        navigator
-                          .share({
-                            title: "TECNI-PEGA Visualizador",
-                            text: `Mira este color: ${selectedColor.name} en ${activeRoom.label}`,
-                            url:
-                              typeof window !== "undefined" ? window.location.href : "",
-                          })
-                          .catch(() => {});
-                      } else if (typeof navigator !== "undefined") {
-                        navigator.clipboard?.writeText(window.location.href);
-                      }
-                    }}
-                  >
-                    <Share2 className="size-3.5" /> Compartir
-                  </button>
-                </div>
+          {/* Color grid */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-blue/70">
+                {colors.length} tonos disponibles
               </div>
-
-              {/* Bottom info chip */}
-              <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
-                <div className="bg-white/95 backdrop-blur rounded-xl px-3 py-2 shadow-card flex items-center gap-2.5">
-                  <div
-                    className="size-7 rounded-md border border-border shrink-0"
-                    style={{ background: selectedColor.hex }}
-                  />
-                  <div className="leading-tight">
-                    <div className="text-xs font-semibold text-brand-blue">
-                      {selectedColor.name}
-                      <span className="ml-1.5 text-[10px] font-mono text-muted-foreground">
-                        {selectedColor.ref}
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-muted-foreground">
-                      {product} · {finish} · {activeRoom.label}
-                    </div>
-                  </div>
-                </div>
-                <div className="hidden sm:flex items-center gap-1.5 bg-black/40 backdrop-blur text-white rounded-lg px-2.5 py-1.5 text-[10px] font-medium">
-                  <Palette className="size-3" />
-                  Render aproximado
-                </div>
+              <div className="text-[11px] font-mono text-muted-foreground">
+                Ref. {selected.ref}
               </div>
             </div>
 
-            <p className="mt-3 text-xs text-muted-foreground">
-              * El color final puede variar según iluminación, textura del muro y
-              preparación de la superficie. Solicite muestra física antes de la compra
-              definitiva.
-            </p>
+            <div className="grid grid-cols-5 gap-3 sm:gap-3.5">
+              {colors.map((c, i) => {
+                const active = colorIdx === i;
+                const light = hexLightness(c.hex) > 0.78;
+                return (
+                  <button
+                    key={c.ref}
+                    onClick={() => setColorIdx(i)}
+                    onMouseEnter={() => setHoverIdx(i)}
+                    onMouseLeave={() => setHoverIdx((v) => (v === i ? null : v))}
+                    aria-label={`${c.name} — ${c.ref}`}
+                    className={`group relative aspect-square rounded-2xl transition-all duration-200 ${
+                      active
+                        ? "ring-2 ring-brand-blue ring-offset-2 ring-offset-[#FBF8F2] scale-[1.04]"
+                        : "ring-1 ring-black/5 hover:scale-[1.06] hover:shadow-card-hover"
+                    } ${light ? "ring-black/10" : ""}`}
+                    style={{ background: c.hex }}
+                  >
+                    {active && (
+                      <Check
+                        className={`absolute inset-0 m-auto size-5 ${
+                          light ? "text-brand-blue" : "text-white drop-shadow"
+                        }`}
+                        strokeWidth={3}
+                      />
+                    )}
+                    {/* Tooltip */}
+                    <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-9 whitespace-nowrap rounded-md bg-neutral-900 text-white text-[11px] font-medium px-2.5 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-lg">
+                      {c.name}
+                      <span className="absolute left-1/2 -translate-x-1/2 -bottom-1 size-2 rotate-45 bg-neutral-900" />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* CTA card */}
+            <div className="mt-6 rounded-2xl border border-border bg-white p-4 md:p-5 shadow-card">
+              <p className="text-sm text-brand-blue">
+                ¿Te gusta{" "}
+                <span className="font-bold">
+                  {(tooltipColor ?? selected).name}
+                </span>
+                ? Solicítala aquí.
+              </p>
+              <a
+                href={ctaHref}
+                target="_blank"
+                rel="noopener"
+                className="btn-primary w-full mt-3 justify-center"
+              >
+                Ver {product.toLowerCase()} <ArrowRight className="size-4" />
+              </a>
+            </div>
           </div>
         </div>
       </div>
