@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft, MessageCircle, ChevronLeft, ChevronRight,
@@ -8,36 +8,15 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { ProductCard } from "@/components/site/ProductCard";
-import { products, whatsappForProduct, type Product } from "@/lib/products";
+import { products, whatsappForProduct } from "@/lib/products";
 
 export const Route = createFileRoute("/producto/$slug")({
-  loader: ({ params }) => {
-    const product = products.find((p) => p.slug === params.slug);
-    if (!product) throw notFound();
-    return { product };
-  },
-  head: ({ loaderData }) => {
-    const p = loaderData?.product;
-    return {
-      meta: [
-        { title: p ? `${p.name} — TECNI-PEGA` : "Producto — TECNI-PEGA" },
-        { name: "description", content: p?.short ?? "Producto TECNI-PEGA" },
-        { property: "og:title", content: p?.name ?? "Producto" },
-        { property: "og:description", content: p?.short ?? "" },
-        ...(p?.image ? [{ property: "og:image", content: p.image }] : []),
-      ],
-    };
-  },
-  notFoundComponent: () => (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <main className="container-x py-32 text-center">
-        <h1 className="text-3xl font-extrabold text-brand-blue">Producto no encontrado</h1>
-        <Link to="/catalogo" className="mt-6 inline-flex btn-primary">Volver al catálogo</Link>
-      </main>
-      <Footer />
-    </div>
-  ),
+  head: () => ({
+    meta: [
+      { title: "Producto — TECNI-PEGA C&P S.A.S." },
+      { name: "description", content: "Detalle de producto TECNI-PEGA: ficha técnica, galería y beneficios." },
+    ],
+  }),
   errorComponent: ({ error, reset }) => (
     <div className="min-h-screen grid place-items-center p-8 text-center">
       <div>
@@ -47,13 +26,30 @@ export const Route = createFileRoute("/producto/$slug")({
       </div>
     </div>
   ),
+  notFoundComponent: () => <ProductNotFound />,
   component: ProductPage,
 });
 
 const featureIcons = [ShieldCheck, Link2, Sparkles, Home, Droplets, CheckCircle2];
 
+function ProductNotFound() {
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navbar />
+      <main className="container-x py-32 text-center flex-1">
+        <h1 className="text-3xl font-extrabold text-brand-blue">Producto no encontrado</h1>
+        <Link to="/catalogo" className="mt-6 inline-flex btn-primary">Volver al catálogo</Link>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
 function ProductPage() {
-  const { product } = Route.useLoaderData() as { product: Product };
+  const { slug } = Route.useParams();
+  const product = products.find((p) => p.slug === slug);
+  if (!product) return <ProductNotFound />;
+
   const images = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
   const [idx, setIdx] = useState(0);
   const [auto, setAuto] = useState(true);
