@@ -8,7 +8,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { ProductCard } from "@/components/site/ProductCard";
-import { products, whatsappForProduct } from "@/lib/products";
+import { products, whatsappForProduct, type Product } from "@/lib/products";
 
 export const Route = createFileRoute("/producto/$slug")({
   loader: ({ params }) => {
@@ -53,7 +53,7 @@ export const Route = createFileRoute("/producto/$slug")({
 const featureIcons = [ShieldCheck, Link2, Sparkles, Home, Droplets, CheckCircle2];
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
+  const { product } = Route.useLoaderData() as { product: Product };
   const images = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
   const [idx, setIdx] = useState(0);
   const [auto, setAuto] = useState(true);
