@@ -1,4 +1,6 @@
 import { MessageCircle, ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import type { Product } from "@/lib/products";
 import { whatsappForProduct } from "@/lib/products";
 
@@ -12,24 +14,64 @@ const categoryAccent: Record<string, string> = {
 };
 
 export function ProductCard({ product }: { product: Product }) {
+  const images = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
+  const hasSlider = images.length > 1;
+  const [idx, setIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const cardRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!hasSlider || paused) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % images.length), 3200);
+    return () => clearInterval(t);
+  }, [hasSlider, paused, images.length]);
+
   return (
-    <article className="group bg-white rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:border-brand-red/40 transition-all duration-300 overflow-hidden flex flex-col">
-      <div className="relative aspect-[4/3] bg-brand-gray-soft overflow-hidden">
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          className="size-full object-contain p-6 transition-transform duration-500 group-hover:scale-105"
-        />
-        <span className={`absolute top-3 left-3 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${categoryAccent[product.category]}`}>
+    <article
+      ref={cardRef}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      className="group bg-white rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:border-brand-red/40 transition-all duration-300 overflow-hidden flex flex-col"
+    >
+      <Link
+        to="/producto/$slug"
+        params={{ slug: product.slug }}
+        className="relative block aspect-[4/3] bg-gradient-to-br from-brand-gray-soft to-white overflow-hidden"
+      >
+        {images.map((src, i) => (
+          <img
+            key={src}
+            src={src}
+            alt={product.name}
+            loading="lazy"
+            className={`absolute inset-0 size-full ${product.gallery ? "object-cover" : "object-contain p-6"} transition-all duration-700 ease-out ${
+              i === idx ? "opacity-100 scale-100" : "opacity-0 scale-105"
+            } group-hover:scale-[1.04]`}
+          />
+        ))}
+
+        <span className={`absolute top-3 left-3 z-10 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${categoryAccent[product.category]}`}>
           {product.category}
         </span>
         {product.highlight && (
-          <span className="absolute top-3 right-3 chip !bg-brand-red/10 !text-brand-red !border-brand-red/20">
+          <span className="absolute top-3 right-3 z-10 chip !bg-white/90 !text-brand-red !border-brand-red/20 backdrop-blur">
             {product.highlight}
           </span>
         )}
-      </div>
+
+        {hasSlider && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/45 backdrop-blur">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                aria-label={`Imagen ${i + 1}`}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIdx(i); }}
+                className={`h-1.5 rounded-full transition-all ${i === idx ? "w-5 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"}`}
+              />
+            ))}
+          </div>
+        )}
+      </Link>
 
       <div className="p-5 flex flex-col flex-1">
         <h3 className="font-display font-bold text-brand-blue text-base leading-snug line-clamp-2">
@@ -60,12 +102,13 @@ export function ProductCard({ product }: { product: Product }) {
         )}
 
         <div className="mt-auto pt-5 flex gap-2">
-          <a
-            href="/#visualizador"
+          <Link
+            to="/producto/$slug"
+            params={{ slug: product.slug }}
             className="inline-flex items-center justify-center gap-1.5 flex-1 rounded-lg px-3 py-2 text-sm font-semibold bg-brand-blue text-white hover:bg-brand-blue-deep transition-colors"
           >
             Ver detalle <ArrowRight className="size-3.5" />
-          </a>
+          </Link>
           <a
             href={whatsappForProduct(product.name)}
             target="_blank"
