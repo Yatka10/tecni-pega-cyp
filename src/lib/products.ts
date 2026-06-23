@@ -18,6 +18,9 @@ import tecnofill from "@/assets/products/tecnofill.webp";
 import granoFachada from "@/assets/products/grano-fachada.webp";
 import estucoExt from "@/assets/products/estuco-exterior.webp";
 import estucoInt from "@/assets/products/estuco-interior.webp";
+import tecniFlexG1 from "@/assets/products/gallery/tecni-flex/1.png";
+import tecniFlexG2 from "@/assets/products/gallery/tecni-flex/2.png";
+import tecniFlexG3 from "@/assets/products/gallery/tecni-flex/3.png";
 
 export type Category =
   | "Pegantes"
@@ -33,6 +36,9 @@ export type Product = {
   short: string;
   category: Category;
   image: string;
+  gallery?: string[];
+  features?: { title: string; desc: string }[];
+  specs?: { label: string; value: string }[];
   uso: ("Interior" | "Exterior")[];
   presentaciones: string[];
   colorRefs?: string[]; // hex
@@ -83,6 +89,19 @@ export const products: Product[] = [
     short: "Pegante de alta flexibilidad para zonas húmedas y exteriores exigentes.",
     category: "Pegantes",
     image: tecniFlex,
+    gallery: [tecniFlexG2, tecniFlexG1, tecniFlexG3],
+    features: [
+      { title: "Resistente al agua", desc: "Mantiene la adherencia tras inmersión prolongada." },
+      { title: "Alta adherencia", desc: "Aditivos tipo látex que garantizan resultados superiores." },
+      { title: "Máxima durabilidad", desc: "Soporta intemperie, cambios térmicos y humedad constante." },
+      { title: "Ideal para exteriores", desc: "Piscinas, fachadas, fuentes y zonas húmedas." },
+    ],
+    specs: [
+      { label: "Mezcla", value: "Agua" },
+      { label: "Tiempo de reposo", value: "5 a 10 minutos" },
+      { label: "Duración de la mezcla", value: "3 horas" },
+      { label: "Rendimiento", value: "≈ 5 m² por 25 kg" },
+    ],
     uso: ["Exterior"],
     presentaciones: ["25 kg"],
     highlight: "Anti-humedad",
