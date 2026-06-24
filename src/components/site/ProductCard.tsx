@@ -14,7 +14,12 @@ const categoryAccent: Record<string, string> = {
 };
 
 export function ProductCard({ product }: { product: Product }) {
-  const images = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
+  const images = product.cardGallery && product.cardGallery.length > 0
+    ? product.cardGallery
+    : product.gallery && product.gallery.length > 0
+      ? product.gallery
+      : [product.image];
+  const useCover = !!(product.cardGallery || product.gallery);
   const hasSlider = images.length > 1;
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -44,7 +49,7 @@ export function ProductCard({ product }: { product: Product }) {
             src={src}
             alt={product.name}
             loading="lazy"
-            className={`absolute inset-0 size-full ${product.gallery ? "object-cover" : "object-contain p-6"} transition-all duration-700 ease-out ${
+            className={`absolute inset-0 size-full ${useCover ? "object-cover" : "object-contain p-6"} transition-all duration-700 ease-out ${
               i === idx ? "opacity-100 scale-100" : "opacity-0 scale-105"
             } group-hover:scale-[1.04]`}
           />
