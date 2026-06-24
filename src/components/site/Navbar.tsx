@@ -87,7 +87,7 @@ export function Navbar() {
                 ["Catálogo", "/catalogo"],
                 ["Visualizador de Colores", "/#visualizador"],
                 ["Categorías", "/#categorias"],
-                ["Aliados", "/#aliados"],
+                ["Productos", "/#productos"],
                 ["Contacto", "/#contacto"],
               ].map(([label, href]) => (
                 <li key={href}>
