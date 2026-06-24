@@ -49,7 +49,7 @@ export function ProductCard({ product }: { product: Product }) {
             src={src}
             alt={product.name}
             loading="lazy"
-            className={`absolute inset-0 size-full ${product.gallery ? "object-cover" : "object-contain p-6"} transition-all duration-700 ease-out ${
+            className={`absolute inset-0 size-full ${useCover ? "object-cover" : "object-contain p-6"} transition-all duration-700 ease-out ${
               i === idx ? "opacity-100 scale-100" : "opacity-0 scale-105"
             } group-hover:scale-[1.04]`}
           />
