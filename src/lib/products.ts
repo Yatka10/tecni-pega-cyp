@@ -40,6 +40,7 @@ export type Product = {
   category: Category;
   image: string;
   gallery?: string[];
+  cardGallery?: string[];
   features?: { title: string; desc: string }[];
   specs?: { label: string; value: string }[];
   uso: ("Interior" | "Exterior")[];
