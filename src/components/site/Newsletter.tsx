@@ -3,7 +3,7 @@ import { WHATSAPP_URL } from "@/lib/products";
 
 export function Newsletter() {
   return (
-    <section className="py-16">
+    <section id="contacto" className="py-16">
       <div className="container-x">
         <div className="relative overflow-hidden rounded-3xl gradient-brand text-white p-8 md:p-12 grid md:grid-cols-5 gap-8 items-center shadow-card-hover">
           {/* decorative */}
