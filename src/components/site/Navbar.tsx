@@ -46,12 +46,12 @@ export function Navbar() {
             </div>
           </Link>
 
-          <ul className="hidden lg:flex items-center gap-7 text-sm font-medium text-brand-blue">
-            <li><Link to="/" hash="" className="hover:text-brand-red transition-colors">Inicio</Link></li>
-            <li><Link to="/catalogo" className="hover:text-brand-red transition-colors">Catálogo</Link></li>
+          <ul className="hidden lg:flex items-center gap-7 text-sm font-semibold text-brand-blue">
+            <li><Link to="/" className="hover:text-brand-red transition-colors relative after:absolute after:left-0 after:-bottom-1.5 after:h-0.5 after:w-full after:scale-x-0 after:bg-brand-red hover:after:scale-x-100 after:transition-transform after:origin-left">Inicio</Link></li>
+            <li><Link to="/catalogo" className="hover:text-brand-red transition-colors relative after:absolute after:left-0 after:-bottom-1.5 after:h-0.5 after:w-full after:scale-x-0 after:bg-brand-red hover:after:scale-x-100 after:transition-transform after:origin-left">Catálogo</Link></li>
             <li><a href="/#visualizador" className="hover:text-brand-red transition-colors">Visualizador</a></li>
             <li><a href="/#categorias" className="hover:text-brand-red transition-colors">Categorías</a></li>
-            <li><a href="/#aliados" className="hover:text-brand-red transition-colors">Aliados</a></li>
+            <li><a href="/#productos" className="hover:text-brand-red transition-colors">Productos</a></li>
             <li><a href="/#contacto" className="hover:text-brand-red transition-colors">Contacto</a></li>
           </ul>
 
