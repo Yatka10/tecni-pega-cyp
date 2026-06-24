@@ -18,9 +18,12 @@ import tecnofill from "@/assets/products/tecnofill.webp";
 import granoFachada from "@/assets/products/grano-fachada.webp";
 import estucoExt from "@/assets/products/estuco-exterior.webp";
 import estucoInt from "@/assets/products/estuco-interior.webp";
-import tecniFlexG1 from "@/assets/products/gallery/tecni-flex/1.png";
-import tecniFlexG2 from "@/assets/products/gallery/tecni-flex/2.png";
-import tecniFlexG3 from "@/assets/products/gallery/tecni-flex/3.png";
+import tecniFlexMain1 from "@/assets/products/gallery/tecni-flex/main/1.webp";
+import tecniFlexMain2 from "@/assets/products/gallery/tecni-flex/main/2.webp";
+import tecniFlexMain3 from "@/assets/products/gallery/tecni-flex/main/3.webp";
+import tecniFlexCard1 from "@/assets/products/gallery/tecni-flex/card/1.webp";
+import tecniFlexCard2 from "@/assets/products/gallery/tecni-flex/card/2.webp";
+import tecniFlexCard3 from "@/assets/products/gallery/tecni-flex/card/3.webp";
 
 export type Category =
   | "Pegantes"
