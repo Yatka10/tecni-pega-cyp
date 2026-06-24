@@ -14,7 +14,12 @@ const categoryAccent: Record<string, string> = {
 };
 
 export function ProductCard({ product }: { product: Product }) {
-  const images = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
+  const images = product.cardGallery && product.cardGallery.length > 0
+    ? product.cardGallery
+    : product.gallery && product.gallery.length > 0
+      ? product.gallery
+      : [product.image];
+  const useCover = !!(product.cardGallery || product.gallery);
   const hasSlider = images.length > 1;
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
