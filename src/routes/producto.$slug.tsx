@@ -17,15 +17,18 @@ export const Route = createFileRoute("/producto/$slug")({
       { name: "description", content: "Detalle de producto TECNI-PEGA: ficha técnica, galería y beneficios." },
     ],
   }),
-  errorComponent: ({ error, reset }) => (
-    <div className="min-h-screen grid place-items-center p-8 text-center">
-      <div>
-        <p className="text-brand-red font-semibold">Algo salió mal</p>
-        <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
-        <button onClick={reset} className="mt-6 btn-primary">Reintentar</button>
+  errorComponent: ({ error, reset }) => {
+    if (typeof console !== "undefined") console.error(error);
+    return (
+      <div className="min-h-screen grid place-items-center p-8 text-center">
+        <div>
+          <p className="text-brand-red font-semibold">Algo salió mal</p>
+          <p className="text-sm text-muted-foreground mt-2">Intenta recargar la página o vuelve al catálogo.</p>
+          <button onClick={reset} className="mt-6 btn-primary">Reintentar</button>
+        </div>
       </div>
-    </div>
-  ),
+    );
+  },
   notFoundComponent: () => <ProductNotFound />,
   component: ProductPage,
 });
