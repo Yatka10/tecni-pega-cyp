@@ -92,7 +92,8 @@ export const products: Product[] = [
     short: "Pegante de alta flexibilidad para zonas húmedas y exteriores exigentes.",
     category: "Pegantes",
     image: tecniFlex,
-    gallery: [tecniFlexG2, tecniFlexG1, tecniFlexG3],
+    gallery: [tecniFlexMain1, tecniFlexMain2, tecniFlexMain3],
+    cardGallery: [tecniFlexCard1, tecniFlexCard2, tecniFlexCard3],
     features: [
       { title: "Resistente al agua", desc: "Mantiene la adherencia tras inmersión prolongada." },
       { title: "Alta adherencia", desc: "Aditivos tipo látex que garantizan resultados superiores." },
