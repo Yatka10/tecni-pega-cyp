@@ -1,8 +1,8 @@
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import a1 from "@/assets/ambient/about1.jpg";
-import a2 from "@/assets/ambient/about2.jpg";
-import a3 from "@/assets/ambient/about3.jpg";
+import a1 from "@/assets/showcase/slide-pinturas.jpg";
+import a2 from "@/assets/rooms/fachada.jpg";
+import a3 from "@/assets/showcase/slide-estucos.jpg";
 
 const points = [
   { title: "Fabricación nacional", desc: "Planta en Colombia con control de calidad por lote." },
