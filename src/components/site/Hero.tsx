@@ -1,6 +1,6 @@
 import { ArrowRight, PlayCircle, ShieldCheck, Award } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import heroImg from "@/assets/ambient/hero.jpg";
+import heroImg from "@/assets/showcase/slide-pegantes.jpg";
 import { WHATSAPP_URL } from "@/lib/products";
 
 export function Hero() {
