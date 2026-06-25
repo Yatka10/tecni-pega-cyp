@@ -1,5 +1,5 @@
 import { MessageSquare, ClipboardList, Truck, HeartHandshake } from "lucide-react";
-import processImg from "@/assets/ambient/process.jpg";
+import processImg from "@/assets/showcase/slide-fachadas.jpg";
 
 const steps = [
   { n: "01", Icon: MessageSquare, title: "Solicita tu cotización", desc: "Escríbenos por WhatsApp o llena el formulario con tus requerimientos." },
