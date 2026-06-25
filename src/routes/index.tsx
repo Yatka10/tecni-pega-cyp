@@ -11,6 +11,12 @@ import { ColorVisualizer } from "@/components/site/ColorVisualizer";
 import { ProductCard } from "@/components/site/ProductCard";
 import { HeroSlider } from "@/components/site/HeroSlider";
 import { products, WHATSAPP_URL, WHATSAPP_PHONE, COMPANY_EMAIL } from "@/lib/products";
+import catPegantes from "@/assets/categories/pegantes.jpg";
+import catPinturas from "@/assets/categories/pinturas.jpg";
+import catEstucos from "@/assets/categories/estucos.jpg";
+import catBoquillas from "@/assets/categories/boquillas.jpg";
+import catAditivos from "@/assets/categories/aditivos.jpg";
+import catRevestimientos from "@/assets/categories/revestimientos.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,12 +33,12 @@ export const Route = createFileRoute("/")({
 });
 
 const categories = [
-  { name: "Pegantes", subs: "Cerámica · Porcelanato · Especiales", Icon: Layers, accent: "bg-brand-blue" },
-  { name: "Pinturas y Esmaltes", subs: "Vinilos T1 y T2 · Anticorrosivos", Icon: PaintBucket, accent: "bg-brand-red", badge: "23 tonos" },
-  { name: "Estucos y Masillas", subs: "Acrílicos · Interior · Exterior · Drywall", Icon: Wrench, accent: "bg-brand-blue" },
-  { name: "Boquillas y Minerales", subs: "Extra Fina · Cerámica · Pigmentos", Icon: Package, accent: "bg-amber-500" },
-  { name: "Aditivos", subs: "Mortero · Cemento", Icon: Droplet, accent: "bg-emerald-600" },
-  { name: "Revestimientos", subs: "Fachadas · Impermeabilizante · Texturizado", Icon: Building2, accent: "bg-slate-800", badge: "TECNOFILL" },
+  { name: "Pegantes", subs: "Cerámica · Porcelanato · Especiales", Icon: Layers, accent: "bg-brand-blue", image: catPegantes, tint: "from-brand-blue/95 via-brand-blue/70 to-brand-blue/10" },
+  { name: "Pinturas y Esmaltes", subs: "Vinilos T1 y T2 · Anticorrosivos", Icon: PaintBucket, accent: "bg-brand-red", badge: "23 tonos", image: catPinturas, tint: "from-brand-red/95 via-brand-red/70 to-brand-red/10" },
+  { name: "Estucos y Masillas", subs: "Acrílicos · Interior · Exterior · Drywall", Icon: Wrench, accent: "bg-brand-blue", image: catEstucos, tint: "from-brand-blue-deep/95 via-brand-blue/65 to-brand-blue/10" },
+  { name: "Boquillas y Minerales", subs: "Extra Fina · Cerámica · Pigmentos", Icon: Package, accent: "bg-amber-500", image: catBoquillas, tint: "from-amber-700/95 via-amber-600/70 to-amber-500/10" },
+  { name: "Aditivos", subs: "Mortero · Cemento", Icon: Droplet, accent: "bg-emerald-600", image: catAditivos, tint: "from-emerald-800/95 via-emerald-600/70 to-emerald-500/10" },
+  { name: "Revestimientos", subs: "Fachadas · Impermeabilizante · Texturizado", Icon: Building2, accent: "bg-slate-800", badge: "TECNOFILL", image: catRevestimientos, tint: "from-slate-900/95 via-slate-800/70 to-slate-700/10" },
 ];
 
 const stats = [
@@ -106,21 +112,44 @@ function Home() {
               <a
                 key={c.name}
                 href="/catalogo"
-                className="group bg-white rounded-2xl border border-border p-6 shadow-card hover:shadow-card-hover hover:border-brand-red/40 transition-all"
+                className="group relative isolate overflow-hidden rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-500 aspect-[4/5] sm:aspect-[5/6] flex flex-col justify-end"
               >
-                <div className="flex items-start justify-between">
-                  <div className={`size-12 rounded-xl grid place-items-center text-white ${c.accent}`}>
-                    <c.Icon className="size-6" />
-                  </div>
-                  {c.badge && (
-                    <span className="chip !bg-brand-red/10 !text-brand-red !border-brand-red/20">{c.badge}</span>
-                  )}
+                {/* Imagen de fondo */}
+                <img
+                  src={c.image}
+                  alt={c.name}
+                  loading="lazy"
+                  width={1024}
+                  height={768}
+                  className="absolute inset-0 size-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-110"
+                />
+                {/* Difuminado de color por categoría */}
+                <div className={`absolute inset-0 bg-gradient-to-t ${c.tint}`} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+                {/* Badge */}
+                {c.badge && (
+                  <span className="absolute top-4 right-4 z-10 chip !bg-white/95 !text-brand-blue !border-white/40 backdrop-blur shadow-sm">
+                    {c.badge}
+                  </span>
+                )}
+
+                {/* Icono */}
+                <div className={`absolute top-4 left-4 z-10 size-12 rounded-xl grid place-items-center text-white ${c.accent} shadow-lg ring-2 ring-white/30 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                  <c.Icon className="size-6" />
                 </div>
-                <h3 className="mt-5 text-xl font-bold text-brand-blue">{c.name}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{c.subs}</p>
-                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-blue group-hover:text-brand-red transition-colors">
-                  Explorar <ArrowRight className="size-4" />
-                </span>
+
+                {/* Contenido */}
+                <div className="relative z-10 p-6 text-white">
+                  <h3 className="font-display text-2xl font-extrabold leading-tight drop-shadow-md">{c.name}</h3>
+                  <p className="mt-1.5 text-sm text-white/85 drop-shadow">{c.subs}</p>
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-white group-hover:gap-3 transition-all">
+                    Explorar
+                    <span className="inline-grid place-items-center size-7 rounded-full bg-white/15 backdrop-blur border border-white/30 group-hover:bg-white group-hover:text-brand-blue transition-colors">
+                      <ArrowRight className="size-3.5" />
+                    </span>
+                  </span>
+                </div>
               </a>
             ))}
           </div>
