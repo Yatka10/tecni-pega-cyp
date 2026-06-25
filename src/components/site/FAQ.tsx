@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Plus, MessageCircle, Phone } from "lucide-react";
-import faqImg from "@/assets/ambient/faq.jpg";
+import faqImg from "@/assets/rooms/sala.jpg";
 import { WHATSAPP_URL, WHATSAPP_PHONE } from "@/lib/products";
 
 const faqs = [
