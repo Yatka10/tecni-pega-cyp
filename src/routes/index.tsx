@@ -93,7 +93,7 @@ function Home() {
       {/* CATEGORÍAS */}
       <section id="categorias" className="py-20">
         <div className="container-x">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+          <Reveal className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div className="max-w-2xl">
               <span className="chip">Nuestro portafolio</span>
               <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-brand-blue">
@@ -106,7 +106,7 @@ function Home() {
             <a href="/catalogo" className="inline-flex items-center gap-1.5 text-brand-red font-semibold hover:gap-2.5 transition-all">
               Ver catálogo completo <ArrowRight className="size-4" />
             </a>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {categories.map((c) => (
