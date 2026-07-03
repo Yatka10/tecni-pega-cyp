@@ -85,7 +85,7 @@ export function HeroSlider() {
           <img
             src={s.img}
             alt={s.kicker}
-            className={`absolute inset-0 size-full object-cover transition-transform duration-[8000ms] ease-out ${i === idx ? "scale-110" : "scale-100"}`}
+            className={`absolute inset-0 size-full object-cover will-change-transform ${i === idx ? "animate-hero-ken" : "scale-[1.06]"}`}
             loading={i === 0 ? "eager" : "lazy"}
             width={1920}
             height={1080}
@@ -103,7 +103,7 @@ export function HeroSlider() {
         const SecondaryIcon = s.ctaSecondary?.Icon;
         return (
           <div className="container-x relative h-full flex flex-col justify-center pt-20 pb-14">
-            <div className="max-w-3xl">
+            <div key={idx} className="max-w-3xl animate-hero-rise">
               <span className="chip !bg-white/10 !text-white !border-white/25 backdrop-blur">
                 {s.kicker}
               </span>

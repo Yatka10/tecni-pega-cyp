@@ -1,8 +1,9 @@
-import { MessageCircle, ArrowRight } from "lucide-react";
+import { MessageCircle, ArrowRight, Palette } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import type { Product } from "@/lib/products";
 import { whatsappForProduct } from "@/lib/products";
+import { ColorPaletteModal } from "@/components/site/ColorPaletteModal";
 
 const categoryAccent: Record<string, string> = {
   Pegantes: "bg-brand-blue text-white",
@@ -23,7 +24,10 @@ export function ProductCard({ product }: { product: Product }) {
   const hasSlider = images.length > 1;
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const cardRef = useRef<HTMLElement | null>(null);
+  const isVinyl = product.slug.startsWith("vinilo");
+  const hasPalette = isVinyl && !!product.colorRefs && product.colorRefs.length > 0;
 
   useEffect(() => {
     if (!hasSlider || paused) return;
@@ -41,6 +45,7 @@ export function ProductCard({ product }: { product: Product }) {
       <Link
         to="/producto/$slug"
         params={{ slug: product.slug }}
+        onClick={hasPalette ? (e) => { e.preventDefault(); setPaletteOpen(true); } : undefined}
         className="relative block aspect-[4/3] bg-gradient-to-br from-brand-gray-soft to-white overflow-hidden"
       >
         {images.map((src, i) => (
@@ -107,13 +112,23 @@ export function ProductCard({ product }: { product: Product }) {
         )}
 
         <div className="mt-auto pt-5 flex gap-2">
-          <Link
-            to="/producto/$slug"
-            params={{ slug: product.slug }}
-            className="inline-flex items-center justify-center gap-1.5 flex-1 rounded-lg px-3 py-2 text-sm font-semibold bg-brand-blue text-white hover:bg-brand-blue-deep transition-colors"
-          >
-            Ver detalle <ArrowRight className="size-3.5" />
-          </Link>
+          {hasPalette ? (
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              className="inline-flex items-center justify-center gap-1.5 flex-1 rounded-lg px-3 py-2 text-sm font-semibold bg-brand-blue text-white hover:bg-brand-blue-deep transition-colors"
+            >
+              <Palette className="size-3.5" /> Ver colores
+            </button>
+          ) : (
+            <Link
+              to="/producto/$slug"
+              params={{ slug: product.slug }}
+              className="inline-flex items-center justify-center gap-1.5 flex-1 rounded-lg px-3 py-2 text-sm font-semibold bg-brand-blue text-white hover:bg-brand-blue-deep transition-colors"
+            >
+              Ver detalle <ArrowRight className="size-3.5" />
+            </Link>
+          )}
           <a
             href={whatsappForProduct(product.name)}
             target="_blank"
@@ -126,6 +141,16 @@ export function ProductCard({ product }: { product: Product }) {
           </a>
         </div>
       </div>
+
+      {hasPalette && (
+        <ColorPaletteModal
+          open={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          productName={product.name}
+          productImage={product.image}
+          hexes={product.colorRefs!}
+        />
+      )}
     </article>
   );
 }
