@@ -109,50 +109,46 @@ function Home() {
           </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {categories.map((c) => (
-              <a
-                key={c.name}
-                href="/catalogo"
-                className="group relative isolate overflow-hidden rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-500 aspect-[4/5] sm:aspect-[5/6] flex flex-col justify-end"
-              >
-                {/* Imagen de fondo */}
-                <img
-                  src={c.image}
-                  alt={c.name}
-                  loading="lazy"
-                  width={1024}
-                  height={768}
-                  className="absolute inset-0 size-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-110"
-                />
-                {/* Difuminado de color por categoría (más fuerte en mobile para contraste) */}
-                <div className={`absolute inset-0 bg-gradient-to-t ${c.tint} opacity-95 sm:opacity-90 transition-opacity duration-500 group-hover:opacity-100`} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
-                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
+            {categories.map((c, i) => (
+              <Reveal key={c.name} delay={i * 90}>
+                <a
+                  href="/catalogo"
+                  className="group relative isolate overflow-hidden rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-500 aspect-[4/5] sm:aspect-[5/6] flex flex-col justify-end"
+                >
+                  <img
+                    src={c.image}
+                    alt={c.name}
+                    loading="lazy"
+                    width={1024}
+                    height={768}
+                    className="absolute inset-0 size-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-110"
+                  />
+                  <div className={`absolute inset-0 bg-gradient-to-t ${c.tint} opacity-95 sm:opacity-90 transition-opacity duration-500 group-hover:opacity-100`} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
 
-                {/* Badge */}
-                {c.badge && (
-                  <span className="absolute top-4 right-4 z-10 chip !bg-white/95 !text-brand-blue !border-white/40 backdrop-blur shadow-sm">
-                    {c.badge}
-                  </span>
-                )}
-
-                {/* Icono */}
-                <div className={`absolute top-4 left-4 z-10 size-12 rounded-xl grid place-items-center text-white ${c.accent} shadow-lg ring-2 ring-white/30 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
-                  <c.Icon className="size-6" />
-                </div>
-
-                {/* Contenido */}
-                <div className="relative z-10 p-6 text-white">
-                  <h3 className="font-display text-2xl font-extrabold leading-tight drop-shadow-md">{c.name}</h3>
-                  <p className="mt-1.5 text-sm text-white/85 drop-shadow">{c.subs}</p>
-                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-white group-hover:gap-3 transition-all">
-                    Explorar
-                    <span className="inline-grid place-items-center size-7 rounded-full bg-white/15 backdrop-blur border border-white/30 group-hover:bg-white group-hover:text-brand-blue transition-colors">
-                      <ArrowRight className="size-3.5" />
+                  {c.badge && (
+                    <span className="absolute top-4 right-4 z-10 chip !bg-white/95 !text-brand-blue !border-white/40 backdrop-blur shadow-sm">
+                      {c.badge}
                     </span>
-                  </span>
-                </div>
-              </a>
+                  )}
+
+                  <div className={`absolute top-4 left-4 z-10 size-12 rounded-xl grid place-items-center text-white ${c.accent} shadow-lg ring-2 ring-white/30 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                    <c.Icon className="size-6" />
+                  </div>
+
+                  <div className="relative z-10 p-6 text-white">
+                    <h3 className="font-display text-2xl font-extrabold leading-tight drop-shadow-md">{c.name}</h3>
+                    <p className="mt-1.5 text-sm text-white/85 drop-shadow">{c.subs}</p>
+                    <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-white group-hover:gap-3 transition-all">
+                      Explorar
+                      <span className="inline-grid place-items-center size-7 rounded-full bg-white/15 backdrop-blur border border-white/30 group-hover:bg-white group-hover:text-brand-blue transition-colors">
+                        <ArrowRight className="size-3.5" />
+                      </span>
+                    </span>
+                  </div>
+                </a>
+              </Reveal>
             ))}
           </div>
         </div>
