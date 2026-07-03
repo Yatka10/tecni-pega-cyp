@@ -45,6 +45,7 @@ export function ProductCard({ product }: { product: Product }) {
       <Link
         to="/producto/$slug"
         params={{ slug: product.slug }}
+        onClick={hasPalette ? (e) => { e.preventDefault(); setPaletteOpen(true); } : undefined}
         className="relative block aspect-[4/3] bg-gradient-to-br from-brand-gray-soft to-white overflow-hidden"
       >
         {images.map((src, i) => (
