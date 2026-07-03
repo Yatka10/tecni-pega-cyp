@@ -24,7 +24,10 @@ export function ProductCard({ product }: { product: Product }) {
   const hasSlider = images.length > 1;
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const cardRef = useRef<HTMLElement | null>(null);
+  const isVinyl = product.slug.startsWith("vinilo");
+  const hasPalette = isVinyl && !!product.colorRefs && product.colorRefs.length > 0;
 
   useEffect(() => {
     if (!hasSlider || paused) return;
