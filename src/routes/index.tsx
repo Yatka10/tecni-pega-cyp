@@ -72,8 +72,8 @@ function Home() {
       <section className="bg-white border-b border-border">
         <div className="container-x py-8">
           <ul className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map(({ Icon, value, label }) => (
-              <li key={label} className="flex items-center gap-3">
+            {stats.map(({ Icon, value, label }, i) => (
+              <Reveal as="li" key={label} delay={i * 80} className="flex items-center gap-3">
                 <div className="size-12 rounded-xl bg-brand-blue-soft text-brand-blue grid place-items-center shrink-0">
                   <Icon className="size-6" />
                 </div>
@@ -81,7 +81,7 @@ function Home() {
                   <div className="font-display font-extrabold text-2xl leading-none text-brand-blue">{value}</div>
                   <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{label}</div>
                 </div>
-              </li>
+              </Reveal>
             ))}
           </ul>
         </div>
