@@ -1,8 +1,9 @@
-import { MessageCircle, ArrowRight } from "lucide-react";
+import { MessageCircle, ArrowRight, Palette } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import type { Product } from "@/lib/products";
 import { whatsappForProduct } from "@/lib/products";
+import { ColorPaletteModal } from "@/components/site/ColorPaletteModal";
 
 const categoryAccent: Record<string, string> = {
   Pegantes: "bg-brand-blue text-white",
