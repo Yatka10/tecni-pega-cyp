@@ -111,13 +111,23 @@ export function ProductCard({ product }: { product: Product }) {
         )}
 
         <div className="mt-auto pt-5 flex gap-2">
-          <Link
-            to="/producto/$slug"
-            params={{ slug: product.slug }}
-            className="inline-flex items-center justify-center gap-1.5 flex-1 rounded-lg px-3 py-2 text-sm font-semibold bg-brand-blue text-white hover:bg-brand-blue-deep transition-colors"
-          >
-            Ver detalle <ArrowRight className="size-3.5" />
-          </Link>
+          {hasPalette ? (
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              className="inline-flex items-center justify-center gap-1.5 flex-1 rounded-lg px-3 py-2 text-sm font-semibold bg-brand-blue text-white hover:bg-brand-blue-deep transition-colors"
+            >
+              <Palette className="size-3.5" /> Ver colores
+            </button>
+          ) : (
+            <Link
+              to="/producto/$slug"
+              params={{ slug: product.slug }}
+              className="inline-flex items-center justify-center gap-1.5 flex-1 rounded-lg px-3 py-2 text-sm font-semibold bg-brand-blue text-white hover:bg-brand-blue-deep transition-colors"
+            >
+              Ver detalle <ArrowRight className="size-3.5" />
+            </Link>
+          )}
           <a
             href={whatsappForProduct(product.name)}
             target="_blank"
@@ -130,6 +140,16 @@ export function ProductCard({ product }: { product: Product }) {
           </a>
         </div>
       </div>
+
+      {hasPalette && (
+        <ColorPaletteModal
+          open={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          productName={product.name}
+          productImage={product.image}
+          hexes={product.colorRefs!}
+        />
+      )}
     </article>
   );
 }
