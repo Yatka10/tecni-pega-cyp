@@ -103,7 +103,7 @@ export function HeroSlider() {
         const SecondaryIcon = s.ctaSecondary?.Icon;
         return (
           <div className="container-x relative h-full flex flex-col justify-center pt-20 pb-14">
-            <div className="max-w-3xl">
+            <div key={idx} className="max-w-3xl animate-hero-rise">
               <span className="chip !bg-white/10 !text-white !border-white/25 backdrop-blur">
                 {s.kicker}
               </span>
