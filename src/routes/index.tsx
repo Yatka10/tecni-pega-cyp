@@ -167,7 +167,11 @@ function Home() {
             </a>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {featured.map((p) => <ProductCard key={p.slug} product={p} />)}
+            {featured.map((p, i) => (
+              <Reveal key={p.slug} delay={i * 70}>
+                <ProductCard product={p} />
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
