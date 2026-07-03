@@ -10,6 +10,7 @@ import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { ColorVisualizer } from "@/components/site/ColorVisualizer";
 import { ProductCard } from "@/components/site/ProductCard";
 import { HeroSlider } from "@/components/site/HeroSlider";
+import { Reveal } from "@/components/site/Reveal";
 import { products, WHATSAPP_URL, WHATSAPP_PHONE, COMPANY_EMAIL } from "@/lib/products";
 import catPegantes from "@/assets/categories/pegantes.jpg";
 import catPinturas from "@/assets/categories/pinturas.jpg";
