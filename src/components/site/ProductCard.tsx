@@ -1,9 +1,8 @@
 import { MessageCircle, ArrowRight, Palette } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Product } from "@/lib/products";
 import { whatsappForProduct } from "@/lib/products";
-import { ColorPaletteModal } from "@/components/site/ColorPaletteModal";
 
 const categoryAccent: Record<string, string> = {
   Pegantes: "bg-brand-blue text-white",
@@ -24,10 +23,8 @@ export function ProductCard({ product }: { product: Product }) {
   const hasSlider = images.length > 1;
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [paletteOpen, setPaletteOpen] = useState(false);
-  const cardRef = useRef<HTMLElement | null>(null);
-  const isVinyl = product.slug.startsWith("vinilo");
-  const hasPalette = isVinyl && !!product.colorRefs && product.colorRefs.length > 0;
+  const [loaded, setLoaded] = useState(false);
+  const hasPalette = product.slug.startsWith("vinilo") && !!product.colorRefs && product.colorRefs.length > 0;
 
   useEffect(() => {
     if (!hasSlider || paused) return;
@@ -37,7 +34,6 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article
-      ref={cardRef}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       className="group bg-white rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:border-brand-red/40 transition-all duration-300 overflow-hidden flex flex-col"
@@ -45,15 +41,18 @@ export function ProductCard({ product }: { product: Product }) {
       <Link
         to="/producto/$slug"
         params={{ slug: product.slug }}
-        onClick={hasPalette ? (e) => { e.preventDefault(); setPaletteOpen(true); } : undefined}
+        preload="intent"
         className="relative block aspect-[4/3] bg-gradient-to-br from-brand-gray-soft to-white overflow-hidden"
       >
+        {!loaded && <div aria-hidden className="absolute inset-0 skeleton-shine" />}
         {images.map((src, i) => (
           <img
             key={src}
             src={src}
             alt={product.name}
             loading="lazy"
+            decoding="async"
+            onLoad={() => i === 0 && setLoaded(true)}
             className={`absolute inset-0 size-full ${useCover ? "object-cover" : "object-contain p-6"} transition-all duration-700 ease-out ${
               i === idx ? "opacity-100 scale-100" : "opacity-0 scale-105"
             } group-hover:scale-[1.04]`}
@@ -113,17 +112,20 @@ export function ProductCard({ product }: { product: Product }) {
 
         <div className="mt-auto pt-5 flex gap-2">
           {hasPalette ? (
-            <button
-              type="button"
-              onClick={() => setPaletteOpen(true)}
+            <Link
+              to="/producto/$slug"
+              params={{ slug: product.slug }}
+              search={{ colores: 1 }}
+              preload="intent"
               className="inline-flex items-center justify-center gap-1.5 flex-1 rounded-lg px-3 py-2 text-sm font-semibold bg-brand-blue text-white hover:bg-brand-blue-deep transition-colors"
             >
               <Palette className="size-3.5" /> Ver colores
-            </button>
+            </Link>
           ) : (
             <Link
               to="/producto/$slug"
               params={{ slug: product.slug }}
+              preload="intent"
               className="inline-flex items-center justify-center gap-1.5 flex-1 rounded-lg px-3 py-2 text-sm font-semibold bg-brand-blue text-white hover:bg-brand-blue-deep transition-colors"
             >
               Ver detalle <ArrowRight className="size-3.5" />
@@ -141,16 +143,6 @@ export function ProductCard({ product }: { product: Product }) {
           </a>
         </div>
       </div>
-
-      {hasPalette && (
-        <ColorPaletteModal
-          open={paletteOpen}
-          onClose={() => setPaletteOpen(false)}
-          productName={product.name}
-          productImage={product.image}
-          hexes={product.colorRefs!}
-        />
-      )}
     </article>
   );
 }
