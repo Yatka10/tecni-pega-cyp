@@ -56,12 +56,19 @@ function ProductNotFound() {
 
 function ProductPage() {
   const { slug } = Route.useParams();
+  const { colores } = Route.useSearch();
   const product = products.find((p) => p.slug === slug);
   if (!product) return <ProductNotFound />;
 
   const images = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
   const [idx, setIdx] = useState(0);
   const [auto, setAuto] = useState(true);
+  const hasPalette = product.slug.startsWith("vinilo") && !!product.colorRefs && product.colorRefs.length > 0;
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    if (colores === 1 && hasPalette) setPaletteOpen(true);
+  }, [colores, hasPalette]);
 
   useEffect(() => {
     if (!auto || images.length < 2) return;
@@ -79,6 +86,7 @@ function ProductPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
+
 
       {/* Breadcrumb */}
       <div className="bg-brand-gray-soft border-b border-border">
