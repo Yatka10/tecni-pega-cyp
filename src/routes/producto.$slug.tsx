@@ -199,6 +199,15 @@ function ProductPage() {
 
             {/* CTAs */}
             <div className="mt-7 flex flex-wrap gap-3">
+              {hasPalette && (
+                <button
+                  type="button"
+                  onClick={() => setPaletteOpen(true)}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-brand-blue text-white font-semibold hover:bg-brand-blue-deep transition-colors"
+                >
+                  <Palette className="size-5" /> Ver colores disponibles
+                </button>
+              )}
               <a href={whatsappForProduct(product.name)} target="_blank" rel="noopener" className="btn-whatsapp">
                 <MessageCircle className="size-5" /> Cotizar por WhatsApp
               </a>
@@ -206,6 +215,7 @@ function ProductPage() {
                 <ArrowLeft className="size-4" /> Volver al catálogo
               </Link>
             </div>
+
 
             {/* Specs */}
             {product.specs && product.specs.length > 0 && (
