@@ -294,6 +294,16 @@ function ProductPage() {
 
       <Footer />
       <WhatsAppFloat />
+      {hasPalette && (
+        <ColorPaletteModal
+          open={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          productName={product.name}
+          productImage={product.image}
+          hexes={product.colorRefs!}
+        />
+      )}
     </div>
   );
 }
+
