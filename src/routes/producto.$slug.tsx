@@ -2,21 +2,27 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft, MessageCircle, ChevronLeft, ChevronRight,
-  ShieldCheck, Droplets, Link2, Home, CheckCircle2, Sparkles,
+  ShieldCheck, Droplets, Link2, Home, CheckCircle2, Sparkles, Palette,
 } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { ProductCard } from "@/components/site/ProductCard";
+import { ColorPaletteModal } from "@/components/site/ColorPaletteModal";
 import { products, whatsappForProduct } from "@/lib/products";
 
+
 export const Route = createFileRoute("/producto/$slug")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    colores: search.colores === 1 || search.colores === "1" ? 1 : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Producto — TECNI-PEGA C&P S.A.S." },
       { name: "description", content: "Detalle de producto TECNI-PEGA: ficha técnica, galería y beneficios." },
     ],
   }),
+
   errorComponent: ({ error, reset }) => {
     if (typeof console !== "undefined") console.error(error);
     return (
@@ -50,12 +56,19 @@ function ProductNotFound() {
 
 function ProductPage() {
   const { slug } = Route.useParams();
+  const { colores } = Route.useSearch();
   const product = products.find((p) => p.slug === slug);
   if (!product) return <ProductNotFound />;
 
   const images = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
   const [idx, setIdx] = useState(0);
   const [auto, setAuto] = useState(true);
+  const hasPalette = product.slug.startsWith("vinilo") && !!product.colorRefs && product.colorRefs.length > 0;
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    if (colores === 1 && hasPalette) setPaletteOpen(true);
+  }, [colores, hasPalette]);
 
   useEffect(() => {
     if (!auto || images.length < 2) return;
@@ -73,6 +86,7 @@ function ProductPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
+
 
       {/* Breadcrumb */}
       <div className="bg-brand-gray-soft border-b border-border">
@@ -95,16 +109,21 @@ function ProductPage() {
               onMouseLeave={() => setAuto(true)}
               className="relative aspect-[4/5] md:aspect-[4/5] rounded-3xl overflow-hidden shadow-card-hover bg-gradient-to-br from-brand-blue-soft to-white"
             >
+              <div aria-hidden className="absolute inset-0 skeleton-shine" />
               {images.map((src, i) => (
                 <img
                   key={src}
                   src={src}
                   alt={`${product.name} - vista ${i + 1}`}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  {...(i === 0 ? { fetchPriority: "high" as const } : {})}
                   className={`absolute inset-0 size-full ${product.gallery ? "object-cover" : "object-contain p-10"} transition-all duration-700 ease-out ${
                     i === idx ? "opacity-100 scale-100" : "opacity-0 scale-105"
                   }`}
                 />
               ))}
+
 
               {/* Top badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
@@ -185,6 +204,15 @@ function ProductPage() {
 
             {/* CTAs */}
             <div className="mt-7 flex flex-wrap gap-3">
+              {hasPalette && (
+                <button
+                  type="button"
+                  onClick={() => setPaletteOpen(true)}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-brand-blue text-white font-semibold hover:bg-brand-blue-deep transition-colors"
+                >
+                  <Palette className="size-5" /> Ver colores disponibles
+                </button>
+              )}
               <a href={whatsappForProduct(product.name)} target="_blank" rel="noopener" className="btn-whatsapp">
                 <MessageCircle className="size-5" /> Cotizar por WhatsApp
               </a>
@@ -192,6 +220,7 @@ function ProductPage() {
                 <ArrowLeft className="size-4" /> Volver al catálogo
               </Link>
             </div>
+
 
             {/* Specs */}
             {product.specs && product.specs.length > 0 && (
@@ -270,6 +299,16 @@ function ProductPage() {
 
       <Footer />
       <WhatsAppFloat />
+      {hasPalette && (
+        <ColorPaletteModal
+          open={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          productName={product.name}
+          productImage={product.image}
+          hexes={product.colorRefs!}
+        />
+      )}
     </div>
   );
 }
+
