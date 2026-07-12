@@ -2,13 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft, MessageCircle, ChevronLeft, ChevronRight,
-  ShieldCheck, Droplets, Link2, Home, CheckCircle2, Sparkles,
+  ShieldCheck, Droplets, Link2, Home, CheckCircle2, Sparkles, Palette,
 } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { ProductCard } from "@/components/site/ProductCard";
+import { ColorPaletteModal } from "@/components/site/ColorPaletteModal";
 import { products, whatsappForProduct } from "@/lib/products";
+
 
 export const Route = createFileRoute("/producto/$slug")({
   head: () => ({
