@@ -109,16 +109,21 @@ function ProductPage() {
               onMouseLeave={() => setAuto(true)}
               className="relative aspect-[4/5] md:aspect-[4/5] rounded-3xl overflow-hidden shadow-card-hover bg-gradient-to-br from-brand-blue-soft to-white"
             >
+              <div aria-hidden className="absolute inset-0 skeleton-shine" />
               {images.map((src, i) => (
                 <img
                   key={src}
                   src={src}
                   alt={`${product.name} - vista ${i + 1}`}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  {...(i === 0 ? { fetchPriority: "high" as const } : {})}
                   className={`absolute inset-0 size-full ${product.gallery ? "object-cover" : "object-contain p-10"} transition-all duration-700 ease-out ${
                     i === idx ? "opacity-100 scale-100" : "opacity-0 scale-105"
                   }`}
                 />
               ))}
+
 
               {/* Top badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
