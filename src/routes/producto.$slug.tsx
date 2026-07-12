@@ -13,12 +13,16 @@ import { products, whatsappForProduct } from "@/lib/products";
 
 
 export const Route = createFileRoute("/producto/$slug")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    colores: search.colores === 1 || search.colores === "1" ? 1 : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Producto — TECNI-PEGA C&P S.A.S." },
       { name: "description", content: "Detalle de producto TECNI-PEGA: ficha técnica, galería y beneficios." },
     ],
   }),
+
   errorComponent: ({ error, reset }) => {
     if (typeof console !== "undefined") console.error(error);
     return (
