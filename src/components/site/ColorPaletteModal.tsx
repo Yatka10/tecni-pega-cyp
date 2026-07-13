@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { MessageCircle, Check, X } from "lucide-react";
+import { MessageCircle, Check, X, Paintbrush } from "lucide-react";
 import { colors as colorLib } from "@/lib/colors";
 import { WHATSAPP_URL } from "@/lib/products";
+import painterScene from "@/assets/preview/painter-scene.jpg";
 
 type Props = {
   open: boolean;
