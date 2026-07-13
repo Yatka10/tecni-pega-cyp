@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { MessageCircle, Check, X } from "lucide-react";
+import { MessageCircle, Check, X, Paintbrush } from "lucide-react";
 import { colors as colorLib } from "@/lib/colors";
 import { WHATSAPP_URL } from "@/lib/products";
+import painterScene from "@/assets/preview/painter-scene.jpg";
 
 type Props = {
   open: boolean;
@@ -59,61 +60,71 @@ export function ColorPaletteModal({ open, onClose, productName, productImage, he
       aria-label={`Paleta de colores ${productName}`}
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-md" />
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white w-full sm:w-[min(960px,95vw)] max-h-[92vh] sm:max-h-[88vh] overflow-hidden rounded-t-3xl sm:rounded-3xl shadow-card-hover flex flex-col animate-in zoom-in-95 fade-in-0 duration-300"
+        className="relative bg-white w-full sm:w-[min(1200px,96vw)] max-h-[94vh] sm:max-h-[92vh] overflow-hidden rounded-t-3xl sm:rounded-3xl shadow-card-hover flex flex-col animate-in zoom-in-95 fade-in-0 duration-300"
       >
         <button
           onClick={onClose}
           aria-label="Cerrar"
-          className="absolute top-3 right-3 z-10 size-9 grid place-items-center rounded-full bg-white/90 hover:bg-white text-brand-blue border border-border shadow-sm transition-colors"
+          className="absolute top-3 right-3 z-20 size-10 grid place-items-center rounded-full bg-white/95 hover:bg-white text-brand-blue border border-border shadow-sm transition-colors"
         >
           <X className="size-4" />
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 overflow-y-auto">
-          {/* Preview */}
-          <div className="relative bg-brand-gray-soft aspect-[4/3] md:aspect-auto md:min-h-[420px] overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-[1.35fr_1fr] gap-0 overflow-y-auto">
+          {/* Preview: painter scene tinted with selected color */}
+          <div className="relative bg-brand-gray-soft aspect-[4/3] md:aspect-auto md:min-h-[560px] overflow-hidden">
             <img
-              src={productImage}
-              alt={productName}
+              src={painterScene}
+              alt="Aplicación de pintura vinilo tipo 1 sobre pared interior"
               className="absolute inset-0 size-full object-cover"
               loading="lazy"
+              width={1280}
+              height={960}
             />
             {selected && (
               <div
                 className="absolute inset-0 mix-blend-multiply transition-colors duration-500"
-                style={{ backgroundColor: selected.hex, opacity: 0.55 }}
+                style={{ backgroundColor: selected.hex }}
                 aria-hidden
               />
             )}
+            {/* Vignette for depth */}
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+
+            <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full bg-white/95 backdrop-blur px-3 py-1.5 shadow-sm">
+              <Paintbrush className="size-3.5 text-brand-red" />
+              <span className="text-[11px] font-semibold text-brand-blue uppercase tracking-wider">Vista previa</span>
+            </div>
+
             {selected && (
-              <div className="absolute left-4 bottom-4 right-4 bg-white/95 backdrop-blur rounded-xl border border-border p-3 flex items-center gap-3 shadow-card">
+              <div className="absolute left-4 bottom-4 right-4 bg-white/95 backdrop-blur rounded-2xl border border-border p-4 flex items-center gap-4 shadow-card">
                 <span
-                  className="size-10 rounded-lg border border-border shrink-0"
+                  className="size-14 rounded-xl border-2 border-white shadow-md shrink-0 ring-1 ring-border"
                   style={{ background: selected.hex }}
                 />
-                <div className="min-w-0">
-                  <div className="font-display font-bold text-brand-blue truncate">{selected.name}</div>
-                  <div className="text-[11px] font-mono text-muted-foreground">{selected.ref}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-display font-bold text-brand-blue text-lg truncate">{selected.name}</div>
+                  <div className="text-xs font-mono text-muted-foreground">{selected.ref} · {selected.hex.toUpperCase()}</div>
                 </div>
               </div>
             )}
           </div>
 
           {/* Swatches */}
-          <div className="p-5 md:p-7 flex flex-col">
+          <div className="p-5 md:p-8 flex flex-col">
             <span className="chip w-fit">Paleta disponible</span>
-            <h3 className="mt-3 font-display font-extrabold text-xl md:text-2xl text-brand-blue leading-tight pr-10">
+            <h3 className="mt-3 font-display font-extrabold text-2xl md:text-3xl text-brand-blue leading-tight pr-10">
               {productName}
             </h3>
-            <p className="mt-1.5 text-sm text-muted-foreground">
-              {swatches.length} {swatches.length === 1 ? "color disponible" : "colores disponibles"}. Selecciona uno para previsualizarlo.
+            <p className="mt-2 text-sm text-muted-foreground">
+              {swatches.length} {swatches.length === 1 ? "color disponible" : "colores disponibles"}. Selecciona uno y visualízalo aplicado en obra.
             </p>
 
-            <div className="mt-5 grid grid-cols-4 sm:grid-cols-5 gap-3">
+            <div className="mt-6 grid grid-cols-5 sm:grid-cols-6 gap-2.5">
               {swatches.map((s) => {
                 const isSel = selected?.hex === s.hex;
                 return (
@@ -125,7 +136,7 @@ export function ColorPaletteModal({ open, onClose, productName, productImage, he
                     aria-label={`${s.name} ${s.ref}`}
                     aria-pressed={isSel}
                     className={`group relative aspect-square rounded-xl border transition-all duration-200 will-change-transform hover:scale-[1.08] hover:shadow-card ${
-                      isSel ? "border-brand-red ring-2 ring-brand-red/30 scale-[1.04]" : "border-border"
+                      isSel ? "border-brand-red ring-2 ring-brand-red/40 scale-[1.05]" : "border-border"
                     } ${isLight(s.hex) ? "shadow-inner" : ""}`}
                     style={{ background: s.hex }}
                   >
@@ -143,15 +154,15 @@ export function ColorPaletteModal({ open, onClose, productName, productImage, he
               href={cta}
               target="_blank"
               rel="noopener"
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white transition-transform hover:-translate-y-0.5"
+              className="mt-7 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 font-semibold text-white transition-transform hover:-translate-y-0.5 shadow-card hover:shadow-card-hover"
               style={{ background: "var(--whatsapp)" }}
             >
               <MessageCircle className="size-4" />
               Cotizar {selected ? `${selected.name}` : "este color"} por WhatsApp
             </a>
 
-            <p className="mt-2 text-[11px] text-muted-foreground text-center">
-              Los tonos pueden variar ligeramente por brillo del monitor. Solicita muestra física al asesor.
+            <p className="mt-3 text-[11px] text-muted-foreground text-center">
+              La visualización es referencial. Los tonos pueden variar por brillo del monitor y textura del muro. Solicita muestra física a tu asesor.
             </p>
           </div>
         </div>
