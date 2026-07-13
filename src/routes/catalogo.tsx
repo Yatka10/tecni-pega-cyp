@@ -7,7 +7,14 @@ import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
 import { ProductCard } from "@/components/site/ProductCard";
 import { products, type Category } from "@/lib/products";
 
+type Search = { cat?: Category };
+
 export const Route = createFileRoute("/catalogo")({
+  validateSearch: (s: Record<string, unknown>): Search => {
+    const allowed: Category[] = ["Pegantes", "Pinturas", "Estucos", "Boquillas", "Aditivos", "Revestimientos"];
+    const cat = typeof s.cat === "string" && (allowed as string[]).includes(s.cat) ? (s.cat as Category) : undefined;
+    return { cat };
+  },
   head: () => ({
     meta: [
       { title: "Catálogo de productos — TECNI-PEGA C&P S.A.S." },
@@ -21,15 +28,18 @@ export const Route = createFileRoute("/catalogo")({
   component: Catalogo,
 });
 
-const allCategories: Category[] = ["Pegantes", "Pinturas", "Estucos", "Boquillas", "Aditivos", "Revestimientos"];
+// Only show categories that actually have products
+const allCategories: Category[] = Array.from(new Set(products.map((p) => p.category))) as Category[];
 const allPresentaciones = Array.from(new Set(products.flatMap((p) => p.presentaciones)));
 
 function Catalogo() {
-  const [cats, setCats] = useState<Set<Category>>(new Set());
+  const { cat: initialCat } = Route.useSearch();
+  const [cats, setCats] = useState<Set<Category>>(new Set(initialCat ? [initialCat] : []));
   const [uso, setUso] = useState<"all" | "Interior" | "Exterior">("all");
   const [pres, setPres] = useState<Set<string>>(new Set());
   const [conColor, setConColor] = useState<"all" | "yes" | "no">("all");
   const [drawer, setDrawer] = useState(false);
+
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
