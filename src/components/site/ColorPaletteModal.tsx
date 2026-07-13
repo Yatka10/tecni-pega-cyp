@@ -3,6 +3,7 @@ import { MessageCircle, Check, X, Paintbrush } from "lucide-react";
 import { colors as colorLib } from "@/lib/colors";
 import { WHATSAPP_URL } from "@/lib/products";
 import painterScene from "@/assets/preview/painter-scene.jpg";
+import painterMask from "@/assets/preview/painter-scene-mask.png";
 
 type Props = {
   open: boolean;
@@ -88,7 +89,17 @@ export function ColorPaletteModal({ open, onClose, productName, productImage, he
             {selected && (
               <div
                 className="absolute inset-0 mix-blend-multiply transition-colors duration-500"
-                style={{ backgroundColor: selected.hex }}
+                style={{
+                  backgroundColor: selected.hex,
+                  WebkitMaskImage: `url(${painterMask})`,
+                  maskImage: `url(${painterMask})`,
+                  WebkitMaskSize: "cover",
+                  maskSize: "cover",
+                  WebkitMaskPosition: "center",
+                  maskPosition: "center",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskRepeat: "no-repeat",
+                }}
                 aria-hidden
               />
             )}
