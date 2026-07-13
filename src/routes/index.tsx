@@ -34,12 +34,12 @@ export const Route = createFileRoute("/")({
 });
 
 const categories = [
-  { name: "Pegantes", subs: "Cerámica · Porcelanato · Especiales", Icon: Layers, accent: "bg-brand-blue", image: catPegantes, tint: "from-brand-blue via-brand-blue/55 to-transparent" },
-  { name: "Pinturas y Esmaltes", subs: "Vinilos T1 y T2 · Anticorrosivos", Icon: PaintBucket, accent: "bg-brand-red", badge: "23 tonos", image: catPinturas, tint: "from-brand-red via-brand-red/55 to-transparent" },
-  { name: "Estucos y Masillas", subs: "Acrílicos · Interior · Exterior · Drywall", Icon: Wrench, accent: "bg-brand-blue", image: catEstucos, tint: "from-brand-blue-deep via-brand-blue-deep/55 to-transparent" },
-  { name: "Boquillas y Minerales", subs: "Extra Fina · Cerámica · Pigmentos", Icon: Package, accent: "bg-amber-500", image: catBoquillas, tint: "from-amber-800 via-amber-700/55 to-transparent" },
-  { name: "Aditivos", subs: "Mortero · Cemento", Icon: Droplet, accent: "bg-emerald-600", image: catAditivos, tint: "from-emerald-900 via-emerald-700/55 to-transparent" },
-  { name: "Revestimientos", subs: "Fachadas · Impermeabilizante · Texturizado", Icon: Building2, accent: "bg-slate-800", badge: "TECNOFILL", image: catRevestimientos, tint: "from-slate-950 via-slate-800/55 to-transparent" },
+  { name: "Pegantes", cat: "Pegantes" as const, subs: "Cerámica · Porcelanato · Especiales", Icon: Layers, accent: "bg-brand-blue", image: catPegantes, tint: "from-brand-blue via-brand-blue/55 to-transparent" },
+  { name: "Pinturas y Esmaltes", cat: "Pinturas" as const, subs: "Vinilos T1 y T2 · Anticorrosivos", Icon: PaintBucket, accent: "bg-brand-red", badge: "23 tonos", image: catPinturas, tint: "from-brand-red via-brand-red/55 to-transparent" },
+  { name: "Estucos y Masillas", cat: "Estucos" as const, subs: "Acrílicos · Interior · Exterior · Drywall", Icon: Wrench, accent: "bg-brand-blue", image: catEstucos, tint: "from-brand-blue-deep via-brand-blue-deep/55 to-transparent" },
+  { name: "Boquillas y Minerales", cat: "Boquillas" as const, subs: "Extra Fina · Cerámica · Pigmentos", Icon: Package, accent: "bg-amber-500", image: catBoquillas, tint: "from-amber-800 via-amber-700/55 to-transparent" },
+  { name: "Aditivos", cat: "Aditivos" as const, subs: "Mortero · Cemento", Icon: Droplet, accent: "bg-emerald-600", image: catAditivos, tint: "from-emerald-900 via-emerald-700/55 to-transparent" },
+  { name: "Revestimientos", cat: "Revestimientos" as const, subs: "Fachadas · Impermeabilizante · Texturizado", Icon: Building2, accent: "bg-slate-800", badge: "TECNOFILL", image: catRevestimientos, tint: "from-slate-950 via-slate-800/55 to-transparent" },
 ];
 
 const stats = [
@@ -112,7 +112,7 @@ function Home() {
             {categories.map((c, i) => (
               <Reveal key={c.name} delay={i * 90}>
                 <a
-                  href="/catalogo"
+                  href={`/catalogo?cat=${encodeURIComponent(c.cat)}`}
                   className="group relative isolate overflow-hidden rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-500 aspect-[4/5] sm:aspect-[5/6] flex flex-col justify-end"
                 >
                   <img
