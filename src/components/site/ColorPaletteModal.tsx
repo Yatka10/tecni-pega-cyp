@@ -99,7 +99,11 @@ export function ColorPaletteModal({ open, onClose, productName, productImage, he
                   maskPosition: "center",
                   WebkitMaskRepeat: "no-repeat",
                   maskRepeat: "no-repeat",
-                }}
+                  // The mask PNG is RGB (no alpha), so we must use luminance:
+                  // white = wall (painted), black = person/objects (untouched)
+                  WebkitMaskMode: "luminance",
+                  maskMode: "luminance",
+                } as React.CSSProperties}
                 aria-hidden
               />
             )}
